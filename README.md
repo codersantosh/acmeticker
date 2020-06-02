@@ -38,7 +38,7 @@ controls: {
 
 ## Code Example
 
-       `jQuery(document).ready(function ($) {  
+        jQuery(document).ready(function ($) {  
 
         $('.my-news-ticker').AcmeTicker({  
             type:'horizontal',
@@ -49,6 +49,6 @@ controls: {
                 next: $('.acme-news-ticker-next')
             }  
         });  
-        })`
+        })
 
 See ***example*** folder
