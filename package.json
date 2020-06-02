@@ -1,0 +1,31 @@
+{
+  "name": "acmeticker",
+  "version": "1.0.0",
+  "description": "js library",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/acmethemes/acmeticker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/acmethemes/acmeticker#readme",
+  "devDependencies": {
+    "autoprefixer": "^9.8.0",
+    "grunt": "^1.1.0",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-notify": "^0.4.5",
+    "grunt-postcss": "^0.9.0"
+  },
+  "dependencies": {
+    "postcss-cli": "^7.1.1"
+  }
+}
