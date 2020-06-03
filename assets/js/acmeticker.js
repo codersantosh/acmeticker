@@ -100,7 +100,6 @@
 					{[mType]: '0px'},
 					speed,
 					function () {
-						console.log('Here')
 						clearInterval(intervalID);
 						intervalID = false;
 						vertiZontal();
@@ -248,6 +247,7 @@
 
 			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
 				mPause = !mPause;
+				thisTicker.toggleClass('acmeticker-pause');
 				if( mPause){
 					thisTicker.stop();
 				}
@@ -259,6 +259,13 @@
 				thisTicker.mouseenter(function(){
 					thisTicker.stop();
 				}).mouseleave(function(){
+					mRestart();
+				});
+			}
+			if(opts.pauseOnFocus){
+				thisTicker.focusin(function(){
+					thisTicker.stop();
+				}).focusout(function(){
 					mRestart();
 				});
 			}
@@ -298,6 +305,7 @@
 			}
 			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
 				e.preventDefault();
+				thisTicker.toggleClass('acmeticker-pause');
 				isPause = !isPause;
 				restart();
 
@@ -306,6 +314,14 @@
 				thisTicker.mouseenter(function(){
 					isPause = true;
 				}).mouseleave(function(){
+					isPause = false;
+				});
+				restart();
+			}
+			if(opts.pauseOnFocus){
+				thisTicker.focusin(function(){
+					isPause = true;
+				}).focusout(function(){
 					isPause = false;
 				});
 				restart();
