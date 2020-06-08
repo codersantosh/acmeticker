@@ -247,7 +247,7 @@
 
 			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
 				mPause = !mPause;
-				thisTicker.toggleClass('acmeticker-pause').trigger('acmeTickerToggle', thisTicker);
+				$(document).trigger('acmeTickerToggle', thisTicker, mPause)
 				if( mPause){
 					thisTicker.stop();
 				}
@@ -305,8 +305,8 @@
 			}
 			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
 				e.preventDefault();
-				thisTicker.toggleClass('acmeticker-pause').trigger('acmeTickerToggle', thisTicker);
 				isPause = !isPause;
+				$(document).trigger('acmeTickerToggle', thisTicker, isPause)
 				restart();
 
 			});
