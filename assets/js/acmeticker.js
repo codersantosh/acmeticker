@@ -42,7 +42,7 @@
 		/*Vertical - horizontal
 		* **Do not change code lines*/
 		function vertiZontal(prevNext = false){
-			let speed = opts.speed,
+		    let speed = opts.speed,
 				autoplay = opts.autoplay,
 				direction = opts.direction;
 
@@ -105,6 +105,9 @@
 						vertiZontal();
 					});
 			}
+            if( intervalID){
+                return false
+            }
 			intervalID = setInterval(play, autoplay);
 		}
 		
