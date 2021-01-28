@@ -247,8 +247,9 @@
 
 				marQueeIt(remainingSpace, remainingTime);
 			}
+			function mToggle(){
+				console.log('mToggle')
 
-			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
 				mPause = !mPause;
 				$(document).trigger('acmeTickerToggle', thisTicker, mPause)
 				if( mPause){
@@ -257,6 +258,10 @@
 				else{
 					mRestart();
 				}
+			}
+
+			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
+				mToggle();
 			});
 			if(opts.pauseOnHover){
 				thisTicker.mouseenter(function(){
