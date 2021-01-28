@@ -2,6 +2,8 @@
 
 A very lightweight jQuery plugin for creating advanced news ticker.
 
+Demo: [Gutentor News Ticker](https://www.demo.gutentor.com/news-ticker/)
+
 
 ## Ticker Type
 
