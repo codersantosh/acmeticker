@@ -1,6 +1,6 @@
-(function($){
+(function ($) {
 	'use strict';
-	$.fn.AcmeTicker = function(options) {
+	$.fn.AcmeTicker = function (options) {
 		/*Merge options and default options*/
 		let opts = $.extend({}, $.fn.AcmeTicker.defaults, options);
 
@@ -19,7 +19,7 @@
 
 		/*Lets init*/
 		init();
-		function init(){
+		function init() {
 			switch (opts.type) {
 				case 'vertical':
 				case 'horizontal':
@@ -41,20 +41,20 @@
 
 		/*Vertical - horizontal
 		* **Do not change code lines*/
-		function vertiZontal(prevNext = false){
-		    let speed = opts.speed,
+		function vertiZontal(prevNext = false) {
+			let speed = opts.speed,
 				autoplay = opts.autoplay,
 				direction = opts.direction;
 
-			if( prevNext){
+			if (prevNext) {
 				speed = 0;
 				autoplay = 0;
 				clearInterval(intervalID);
 				intervalID = false;
 			}
 
-			function play(){
-				if( isPause){
+			function play() {
+				if (isPause) {
 					clearInterval(intervalID);
 					intervalID = false;
 					return false;
@@ -65,24 +65,24 @@
 					mVal;
 
 				dChild = thisTicker.find('li:first');
-				if(direction === 'up' || direction === 'right'){
+				if (direction === 'up' || direction === 'right') {
 					eqType = '-=';
 				}
-				else{
+				else {
 					eqType = '+=';
 				}
-				if(opts.type === 'horizontal' ){
+				if (opts.type === 'horizontal') {
 					mType = 'left';
 					mVal = dChild.outerWidth(true);
 				}
-				else{
+				else {
 					mType = 'margin-top';
 					mVal = dChild.outerHeight(true);
 				}
-				if( prevNext === 'prev'){
+				if (prevNext === 'prev') {
 					thisTicker.find('li:last').detach().prependTo(thisTicker);
 				}
-				else{
+				else {
 					dChild.detach().appendTo(thisTicker);
 				}
 
@@ -97,7 +97,7 @@
 					[mType]: eqType + mVal + 'px',
 				});
 				thisTicker.find('li:first').animate(
-					{[mType]: '0px'},
+					{ [mType]: '0px' },
 					speed,
 					function () {
 						clearInterval(intervalID);
@@ -105,29 +105,29 @@
 						vertiZontal();
 					});
 			}
-            if( intervalID){
-                return false
-            }
+			if (intervalID) {
+				return false
+			}
 			intervalID = setInterval(play, autoplay);
 		}
-		
+
 		/*Type-Writer
 		* **Do not change code lines*/
-		function typeWriter( prevNext = false ) {
-			if( isPause){
+		function typeWriter(prevNext = false) {
+			if (isPause) {
 				return false;
 			}
-			if( prevNext){
+			if (prevNext) {
 				clearInterval(intervalID);
 				intervalID = false;
 
 				clearTimeout(timeoutID);
 				timeoutID = false;
-				
-				if( prevNext === 'prev'){
+
+				if (prevNext === 'prev') {
 					thisTicker.find('li:last').detach().prependTo(thisTicker);
 				}
-				else{
+				else {
 					thisTicker.find('li:first').detach().appendTo(thisTicker);
 				}
 			}
@@ -138,7 +138,7 @@
 				wrapEl = typeEl.children(),
 				count = 0;
 
-			if( typeEl.attr('data-text')){
+			if (typeEl.attr('data-text')) {
 				wrapEl.text(typeEl.attr('data-text'))
 			}
 
@@ -160,25 +160,25 @@
 
 			function type() {
 				count++;
-				let typeText =  allText.substring(0, count);
-				if( !typeEl.attr('data-text')){
-					typeEl.attr('data-text',allText);
+				let typeText = allText.substring(0, count);
+				if (!typeEl.attr('data-text')) {
+					typeEl.attr('data-text', allText);
 				}
 
-				if ( count <= allText.length ){
+				if (count <= allText.length) {
 					wrapEl.text(typeText);
 					typeEl.css({
 						opacity: '1',
 						display: 'block',
 					});
 				}
-				else{
+				else {
 					clearInterval(intervalID);
 					intervalID = false;
 					timeoutID = setTimeout(tNext, autoplay);
 				}
 			}
-			if( !intervalID){
+			if (!intervalID) {
 				intervalID = setInterval(type, speed);
 			}
 		}
@@ -197,7 +197,7 @@
 				mPause = false;
 
 			mInit();
-			function mInit(){
+			function mInit() {
 				thisTicker.css({
 					position: 'absolute'
 				})
@@ -208,21 +208,21 @@
 				let tickerList = thisTicker.find("li");
 				wrapWidth = thisTicker.parent().outerWidth(true);
 
-				if( direction === 'right'){
+				if (direction === 'right') {
 					dir = 'right'
 				}
 
 				/*Calculating ticker width*/
 				thisTicker.width(10000);/*temporary width to prevent inline elements wrapping to initial width of ticker*/
-				tickerList.each(function() {
-					listWidth += $(this).outerWidth(true)+5;/*+5 for some missing px*/
+				tickerList.each(function () {
+					listWidth += $(this).outerWidth(true) + 5;/*+5 for some missing px*/
 				});
 				thisTicker.width(listWidth);
 
 				totalTravel = listWidth + wrapWidth;
 				defTiming = totalTravel / speed;
 
-				marQueeIt(listWidth, listWidth/speed);
+				marQueeIt(listWidth, listWidth / speed);
 			}
 
 			function marQueeIt(lPos, lSpeed) {
@@ -230,7 +230,7 @@
 					{ [dir]: '-=' + lPos },
 					lSpeed,
 					"linear",
-					function() {
+					function () {
 						thisTicker.css({
 							[dir]: wrapWidth
 						});
@@ -239,41 +239,41 @@
 				);
 			}
 
-			function mRestart(){
+			function mRestart() {
 				let offset = thisTicker.offset(),
-					rOffset = direction === 'right'?(listWidth-offset.left):offset.left,
+					rOffset = direction === 'right' ? (listWidth - offset.left) : offset.left,
 					remainingSpace = rOffset + listWidth,
-					remainingTime = remainingSpace/speed;
+					remainingTime = remainingSpace / speed;
 
 				marQueeIt(remainingSpace, remainingTime);
 			}
-			function mToggle(){
+			function mToggle() {
 				console.log('mToggle')
 
 				mPause = !mPause;
 				$(document).trigger('acmeTickerToggle', thisTicker, mPause)
-				if( mPause){
+				if (mPause) {
 					thisTicker.stop();
 				}
-				else{
+				else {
 					mRestart();
 				}
 			}
 
-			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
+			opts.controls.toggle && opts.controls.toggle.on('click', function (e) {
 				mToggle();
 			});
-			if(opts.pauseOnHover){
-				thisTicker.on('mouseenter', function(){
+			if (opts.pauseOnHover) {
+				thisTicker.on('mouseenter', function () {
 					thisTicker.stop();
-				}).on('mouseleave', function(){
+				}).on('mouseleave', function () {
 					mRestart();
 				});
 			}
-			if(opts.pauseOnFocus){
-				thisTicker.on('focusin', function(){
+			if (opts.pauseOnFocus) {
+				thisTicker.on('focusin', function () {
 					thisTicker.stop();
-				}).on('focusout', function(){
+				}).on('focusout', function () {
 					mRestart();
 				});
 			}
@@ -281,8 +281,8 @@
 		/*marQuee End*/
 
 		/*Actions/Controls*/
-		if( opts.type !== 'marquee'){
-			opts.controls.prev && opts.controls.prev.on('click', function(e){
+		if (opts.type !== 'marquee') {
+			opts.controls.prev && opts.controls.prev.on('click', function (e) {
 				e.preventDefault();
 				switch (opts.type) {
 					case 'typewriter':
@@ -294,7 +294,7 @@
 						break
 				}
 			});
-			opts.controls.next && opts.controls.next.on('click', function(e){
+			opts.controls.next && opts.controls.next.on('click', function (e) {
 				e.preventDefault();
 				switch (opts.type) {
 					case 'typewriter':
@@ -306,32 +306,31 @@
 						break
 				}
 			});
-			function restart(){
-				if( !isPause){
+			function restart() {
+				if (!isPause) {
 					init();
 				}
 			}
-			opts.controls.toggle && opts.controls.toggle.on('click', function(e){
+			opts.controls.toggle && opts.controls.toggle.on('click', function (e) {
 				e.preventDefault();
 				isPause = !isPause;
 				$(document).trigger('acmeTickerToggle', thisTicker, isPause)
 				restart();
-
 			});
-			if(opts.pauseOnHover){
-				thisTicker.on('mouseenter', function(){
+			if (opts.pauseOnHover) {
+				thisTicker.on('mouseenter', function () {
 					isPause = true;
 					restart();
-				}).on('mouseleave', function(){
+				}).on('mouseleave', function () {
 					isPause = false;
 					restart();
 				});
 			}
-			if(opts.pauseOnFocus){
-				thisTicker.on('focusin', function(){
+			if (opts.pauseOnFocus) {
+				thisTicker.on('focusin', function () {
 					isPause = true;
 					restart();
-				}).on('focusout', function(){
+				}).on('focusout', function () {
 					isPause = false;
 					restart();
 				});
@@ -342,7 +341,7 @@
 	// plugin defaults - added as a property on our plugin function
 	$.fn.AcmeTicker.defaults = {
 		/*Note: Marquee only take speed not autoplay*/
-		type:'horizontal',/*vertical/horizontal/marquee/typewriter*/
+		type: 'horizontal',/*vertical/horizontal/marquee/typewriter*/
 		autoplay: 2000,/*true/false/number*/ /*For vertical/horizontal 4000*//*For typewriter 2000*/
 		speed: 50,/*true/false/number*/ /*For vertical/horizontal 600*//*For marquee 0.05*//*For typewriter 50*/
 		direction: 'up',/*up/down/left/right*//*For vertical up/down*//*For horizontal/marquee right/left*//*For typewriter direction doesnot work*/
