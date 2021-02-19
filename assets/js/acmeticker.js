@@ -264,16 +264,16 @@
 				mToggle();
 			});
 			if(opts.pauseOnHover){
-				thisTicker.mouseenter(function(){
+				thisTicker.on('mouseenter', function(){
 					thisTicker.stop();
-				}).mouseleave(function(){
+				}).on('mouseleave', function(){
 					mRestart();
 				});
 			}
 			if(opts.pauseOnFocus){
-				thisTicker.focusin(function(){
+				thisTicker.on('focusin', function(){
 					thisTicker.stop();
-				}).focusout(function(){
+				}).on('focusout', function(){
 					mRestart();
 				});
 			}
@@ -319,20 +319,22 @@
 
 			});
 			if(opts.pauseOnHover){
-				thisTicker.mouseenter(function(){
+				thisTicker.on('mouseenter', function(){
 					isPause = true;
-				}).mouseleave(function(){
+					restart();
+				}).on('mouseleave', function(){
 					isPause = false;
+					restart();
 				});
-				restart();
 			}
 			if(opts.pauseOnFocus){
-				thisTicker.focusin(function(){
+				thisTicker.on('focusin', function(){
 					isPause = true;
-				}).focusout(function(){
+					restart();
+				}).on('focusout', function(){
 					isPause = false;
+					restart();
 				});
-				restart();
 			}
 		}
 	};
