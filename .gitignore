@@ -1,1 +1,4 @@
 node_modules
+deploy
+.idea
+.sass-cache
