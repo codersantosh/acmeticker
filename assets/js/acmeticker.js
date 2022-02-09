@@ -248,8 +248,6 @@
 				marQueeIt(remainingSpace, remainingTime);
 			}
 			function mToggle() {
-				console.log('mToggle')
-
 				mPause = !mPause;
 				$(document).trigger('acmeTickerToggle', thisTicker, mPause)
 				if (mPause) {
