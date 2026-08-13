@@ -8,6 +8,7 @@ describe('AcmeTicker defaults (v1 parity)', () => {
       autoplay: 2000,
       speed: 50,
       direction: 'up',
+      rtl: 'auto',
       pauseOnFocus: true,
       pauseOnHover: true,
       controls: { prev: '', next: '', toggle: '' },

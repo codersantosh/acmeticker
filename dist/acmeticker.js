@@ -126,6 +126,22 @@ var AcmeTicker = (() => {
   function prefersReducedMotion() {
     return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
+  function resolveRTL(rtl, el) {
+    if (typeof rtl === "boolean") {
+      return rtl;
+    }
+    const dirEl = el.closest("[dir]");
+    if (dirEl) {
+      const dir = dirEl.getAttribute("dir")?.toLowerCase();
+      if (dir === "rtl") {
+        return true;
+      }
+      if (dir === "ltr") {
+        return false;
+      }
+    }
+    return typeof getComputedStyle === "function" && getComputedStyle(el).direction === "rtl";
+  }
   function createWrap(el) {
     const wrap = document.createElement("div");
     wrap.className = "acmeticker-wrap";
@@ -180,7 +196,7 @@ var AcmeTicker = (() => {
         this.rafID = requestFrame(this.frame);
       };
       this.host = host;
-      this.directionRight = host.options.direction === "right";
+      this.directionRight = host.rtl ? host.options.direction === "left" : host.options.direction === "right";
       this.speed = host.options.speed;
     }
     init() {
@@ -278,8 +294,9 @@ var AcmeTicker = (() => {
       this.startLeg(0, -this.listWidth, this.listWidth / this.speed);
     }
     applyTransform() {
+      const offset = this.host.rtl ? this.wrapWidth - this.listWidth * 2 : 0;
       const x = this.directionRight ? this.wrapWidth - this.listWidth * 2 - this.position : this.position;
-      this.host.element.style.transform = `translateX(${x}px)`;
+      this.host.element.style.transform = `translateX(${x - offset}px)`;
     }
   };
 
@@ -496,6 +513,7 @@ var AcmeTicker = (() => {
         li.style.position = "";
         li.style.marginTop = "";
         li.style.left = "";
+        li.style.right = "";
       }
     }
     arm() {
@@ -563,7 +581,9 @@ var AcmeTicker = (() => {
       for (const li of directLiChildren(ul)) {
         li.style.opacity = "0";
         li.style.display = "none";
-        li.style[styleProp] = "";
+        li.style.marginTop = "";
+        li.style.left = "";
+        li.style.right = "";
       }
       const first = directLiChildren(ul)[0];
       if (first) {
@@ -573,8 +593,14 @@ var AcmeTicker = (() => {
         first.style[styleProp] = "0px";
       }
     }
+    horizontalBoxWidth() {
+      return this.host.wrap.offsetWidth;
+    }
     styleProp() {
-      return this.horizontal ? "left" : "marginTop";
+      if (this.horizontal) {
+        return this.host.rtl ? "right" : "left";
+      }
+      return "marginTop";
     }
     visibleHeight() {
       const box = this.host.wrap.parentElement;
@@ -584,14 +610,22 @@ var AcmeTicker = (() => {
     }
     animate(el) {
       const styleProp = this.styleProp();
-      const negative = this.host.options.direction === "up" || this.host.options.direction === "right";
+      let negative = this.host.options.direction === "up" || this.host.options.direction === "right";
+      const rtlHorizontal = this.horizontal && this.host.rtl;
+      if (rtlHorizontal) {
+        negative = !negative;
+      }
       el.style.display = "block";
+      el.style.position = "absolute";
       const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
-      const from = negative ? -travel : travel;
+      const from = rtlHorizontal ? negative ? -(this.horizontalBoxWidth() + travel) : travel : negative ? -travel : travel;
+      const rest = 0;
       for (const li of directLiChildren(this.host.element)) {
         li.style.opacity = "0";
         li.style.display = "none";
-        li.style[styleProp] = "";
+        li.style.marginTop = "";
+        li.style.left = "";
+        li.style.right = "";
       }
       el.style.opacity = "1";
       el.style.position = "absolute";
@@ -599,7 +633,7 @@ var AcmeTicker = (() => {
       el.style[styleProp] = `${from}px`;
       const duration = this.host.options.speed;
       if (!(duration > 0)) {
-        el.style[styleProp] = "0px";
+        el.style[styleProp] = `${rest}px`;
         this.complete();
         return;
       }
@@ -610,12 +644,12 @@ var AcmeTicker = (() => {
         }
         const progress = Math.min(1, (ts - startTs) / duration);
         if (progress >= 1) {
-          el.style[styleProp] = "0px";
+          el.style[styleProp] = `${rest}px`;
           this.rafID = null;
           this.complete();
           return;
         }
-        el.style[styleProp] = `${from * (1 - SWING(progress))}px`;
+        el.style[styleProp] = `${rest + (from - rest) * (1 - SWING(progress))}px`;
         this.rafID = requestFrame(frame);
       };
       this.rafID = requestFrame(frame);
@@ -654,6 +688,7 @@ var AcmeTicker = (() => {
     autoplay: 2e3,
     speed: 50,
     direction: "up",
+    rtl: "auto",
     pauseOnFocus: true,
     pauseOnHover: true,
     controls: {
@@ -676,6 +711,7 @@ var AcmeTicker = (() => {
       this.options = mergeOptions(options);
       this.paused = prefersReducedMotion();
       this.explicitPaused = this.paused;
+      this.rtl = resolveRTL(this.options.rtl, this.element);
       this.wrap = createWrap(this.element);
       hideAllButFirst(this.element);
       this.controls = resolveControls(this.options);
@@ -719,6 +755,7 @@ var AcmeTicker = (() => {
       Object.assign(this.options, options, {
         controls: { ...this.options.controls, ...options?.controls }
       });
+      this.rtl = resolveRTL(this.options.rtl, this.element);
       this.unbindControls();
       this.unbindHoverFocus();
       this.controls = resolveControls(this.options);

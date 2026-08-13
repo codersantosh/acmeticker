@@ -4,7 +4,7 @@ import type { TickerEngine } from './index';
 
 const SWING = (progress: number): number => 0.5 - Math.cos(progress * Math.PI) / 2;
 
-type StyleProp = 'marginTop' | 'left';
+type StyleProp = 'marginTop' | 'left' | 'right';
 
 export class VerticalHorizontalEngine implements TickerEngine {
   private readonly host: TickerHost;
@@ -60,6 +60,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
       li.style.position = '';
       li.style.marginTop = '';
       li.style.left = '';
+      li.style.right = '';
     }
   }
 
@@ -133,7 +134,9 @@ export class VerticalHorizontalEngine implements TickerEngine {
     for (const li of directLiChildren(ul)) {
       li.style.opacity = '0';
       li.style.display = 'none';
-      li.style[styleProp] = '';
+      li.style.marginTop = '';
+      li.style.left = '';
+      li.style.right = '';
     }
     const first = directLiChildren(ul)[0];
     if (first) {
@@ -144,8 +147,15 @@ export class VerticalHorizontalEngine implements TickerEngine {
     }
   }
 
+  private horizontalBoxWidth(): number {
+    return this.host.wrap.offsetWidth;
+  }
+
   private styleProp(): StyleProp {
-    return this.horizontal ? 'left' : 'marginTop';
+    if (this.horizontal) {
+      return this.host.rtl ? 'right' : 'left';
+    }
+    return 'marginTop';
   }
 
   private visibleHeight(): number {
@@ -157,16 +167,30 @@ export class VerticalHorizontalEngine implements TickerEngine {
 
   private animate(el: HTMLElement): void {
     const styleProp = this.styleProp();
-    const negative =
+    let negative =
       this.host.options.direction === 'up' || this.host.options.direction === 'right';
+    const rtlHorizontal = this.horizontal && this.host.rtl;
+    if (rtlHorizontal) {
+      negative = !negative;
+    }
     el.style.display = 'block';
+    el.style.position = 'absolute';
     const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
-    const from = negative ? -travel : travel;
+    const from = rtlHorizontal
+      ? negative
+        ? -(this.horizontalBoxWidth() + travel)
+        : travel
+      : negative
+        ? -travel
+        : travel;
+    const rest = 0;
 
     for (const li of directLiChildren(this.host.element)) {
       li.style.opacity = '0';
       li.style.display = 'none';
-      li.style[styleProp] = '';
+      li.style.marginTop = '';
+      li.style.left = '';
+      li.style.right = '';
     }
     el.style.opacity = '1';
     el.style.position = 'absolute';
@@ -175,7 +199,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
 
     const duration = this.host.options.speed;
     if (!(duration > 0)) {
-      el.style[styleProp] = '0px';
+      el.style[styleProp] = `${rest}px`;
       this.complete();
       return;
     }
@@ -187,12 +211,12 @@ export class VerticalHorizontalEngine implements TickerEngine {
       }
       const progress = Math.min(1, (ts - startTs) / duration);
       if (progress >= 1) {
-        el.style[styleProp] = '0px';
+        el.style[styleProp] = `${rest}px`;
         this.rafID = null;
         this.complete();
         return;
       }
-      el.style[styleProp] = `${from * (1 - SWING(progress))}px`;
+      el.style[styleProp] = `${rest + (from - rest) * (1 - SWING(progress))}px`;
       this.rafID = requestFrame(frame);
     };
     this.rafID = requestFrame(frame);

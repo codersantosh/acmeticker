@@ -21,7 +21,9 @@ export class MarqueeEngine implements TickerEngine {
 
   constructor(host: TickerHost) {
     this.host = host;
-    this.directionRight = host.options.direction === 'right';
+    this.directionRight = host.rtl
+      ? host.options.direction === 'left'
+      : host.options.direction === 'right';
     this.speed = host.options.speed;
   }
 
@@ -143,9 +145,10 @@ export class MarqueeEngine implements TickerEngine {
   }
 
   private applyTransform(): void {
+    const offset = this.host.rtl ? this.wrapWidth - this.listWidth * 2 : 0;
     const x = this.directionRight
       ? this.wrapWidth - this.listWidth * 2 - this.position
       : this.position;
-    this.host.element.style.transform = `translateX(${x}px)`;
+    this.host.element.style.transform = `translateX(${x - offset}px)`;
   }
 }

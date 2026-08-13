@@ -2,7 +2,7 @@
 
 All notable changes to AcmeTicker are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [2.0.0] - 2026-08-12
+## [2.0.0] - 2026-08-13
 
 ### Breaking changes
 
@@ -18,6 +18,7 @@ All notable changes to AcmeTicker are documented here. The format follows [Keep 
 - **`play()`, `pause()`, `toggle()`, `next()`, `prev()`** - programmatic control, matching the click-handler semantics of the v1 controls.
 - **`acmeTickerCycle` event** - fired on `document` each time the ticker completes a full pass through its items, with a per-init cycle counter in `event.detail.count`. Fired after all items have been shown once for vertical/horizontal/typewriter and after each full list scroll for marquee.
 - **`autoplay: 0` now yields a continuous, interruption-free loop** for vertical/horizontal/typewriter - the next transition starts the moment the previous one finishes. This was impossible in v1, where `autoplay: 0` caused overlapping, corrupted animations.
+- **Right-to-left (RTL) support.** `direction` is now logical: on RTL pages (`dir="rtl"` via attribute, `dir="auto"`, CSS `direction: rtl`, or the `<html>` element) horizontal and marquee tickers mirror automatically so they scroll in the reading direction. The new `rtl: 'auto' | boolean` option (`'auto'` default) overrides detection. Vertical and typewriter are direction-neutral and unaffected.
 - **Marquee loop is now seamless.** v1 left a brief visible blank at each loop boundary; v2 duplicates the items internally so the window is never empty (duplicates are removed on `destroy()`).
 - **ESM / CJS / global (IIFE) builds**, TypeScript types, and an `exports` map for modern bundlers.
 - **Development tooling:** `npm run dev` now watches `src/`, regenerates bundles and type declarations on change, and serves the examples at `localhost:8080` (`npm run serve` for the server alone).

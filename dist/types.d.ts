@@ -1,5 +1,6 @@
 export type TickerType = 'vertical' | 'horizontal' | 'marquee' | 'typewriter';
 export type TickerDirection = 'up' | 'down' | 'left' | 'right';
+export type RtlSetting = boolean | 'auto';
 export type ControlTarget = string | HTMLElement | NodeListOf<HTMLElement> | Array<HTMLElement> | null | undefined;
 export interface AcmeTickerControls {
     prev?: ControlTarget;
@@ -11,6 +12,7 @@ export interface AcmeTickerOptions {
     autoplay: number;
     speed: number;
     direction: TickerDirection;
+    rtl: RtlSetting;
     pauseOnFocus: boolean;
     pauseOnHover: boolean;
     controls: AcmeTickerControls;
@@ -21,6 +23,7 @@ export interface TickerHost {
     readonly wrap: HTMLElement;
     readonly options: AcmeTickerOptions;
     readonly paused: boolean;
+    readonly rtl: boolean;
     emitToggle(paused: boolean): void;
     emitCycle(count: number): void;
 }

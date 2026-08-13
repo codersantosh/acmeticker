@@ -36,6 +36,23 @@ export function prefersReducedMotion(): boolean {
   );
 }
 
+export function resolveRTL(rtl: boolean | 'auto', el: HTMLElement): boolean {
+  if (typeof rtl === 'boolean') {
+    return rtl;
+  }
+  const dirEl = el.closest('[dir]');
+  if (dirEl) {
+    const dir = dirEl.getAttribute('dir')?.toLowerCase();
+    if (dir === 'rtl') {
+      return true;
+    }
+    if (dir === 'ltr') {
+      return false;
+    }
+  }
+  return typeof getComputedStyle === 'function' && getComputedStyle(el).direction === 'rtl';
+}
+
 export function createWrap(el: HTMLElement): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'acmeticker-wrap';

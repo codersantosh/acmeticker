@@ -4,6 +4,7 @@ export declare class AcmeTicker implements TickerHost {
     readonly wrap: HTMLElement;
     readonly options: AcmeTickerOptions;
     paused: boolean;
+    rtl: boolean;
     private explicitPaused;
     private engine;
     private controls;

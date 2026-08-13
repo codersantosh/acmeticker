@@ -4,6 +4,7 @@ export type {
   AcmeTickerControls,
   AcmeTickerOptions,
   ControlTarget,
+  RtlSetting,
   TickerDirection,
   TickerHost,
   TickerType,

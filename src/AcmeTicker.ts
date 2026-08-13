@@ -5,7 +5,7 @@ import {
   type ControlCallbacks,
   type ResolvedControls,
 } from './controls';
-import { createWrap, directLiChildren, hideAllButFirst, prefersReducedMotion, unwrap } from './dom';
+import { createWrap, directLiChildren, hideAllButFirst, prefersReducedMotion, resolveRTL, unwrap } from './dom';
 import { createEngine, type TickerEngine } from './engines';
 import { DEFAULTS, type AcmeTickerOptions, type TickerHost } from './types';
 
@@ -16,6 +16,7 @@ export class AcmeTicker implements TickerHost {
   readonly wrap: HTMLElement;
   readonly options: AcmeTickerOptions;
   paused: boolean;
+  rtl: boolean;
 
   private explicitPaused = false;
   private engine: TickerEngine;
@@ -33,6 +34,7 @@ export class AcmeTicker implements TickerHost {
     this.options = mergeOptions(options);
     this.paused = prefersReducedMotion();
     this.explicitPaused = this.paused;
+    this.rtl = resolveRTL(this.options.rtl, this.element);
     this.wrap = createWrap(this.element);
     hideAllButFirst(this.element);
 
@@ -84,6 +86,7 @@ export class AcmeTicker implements TickerHost {
     Object.assign(this.options, options, {
       controls: { ...this.options.controls, ...options?.controls },
     });
+    this.rtl = resolveRTL(this.options.rtl, this.element);
 
     this.unbindControls();
     this.unbindHoverFocus();
