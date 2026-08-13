@@ -3,3 +3,5 @@ deploy
 .idea
 .sass-cache
 .playwright-cli
+
+examples/react/bundle.js

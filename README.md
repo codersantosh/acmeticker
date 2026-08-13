@@ -71,6 +71,14 @@ function NewsTicker() {
 }
 ```
 
+A runnable React demo (all four ticker types, styled with the atomic CSS) lives in [`examples/react/`](examples/react/). Start it with:
+
+```sh
+npm run demo:react
+```
+
+then open http://localhost:8085/react/index.html.
+
 Vue:
 
 ```js

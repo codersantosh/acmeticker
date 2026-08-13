@@ -12,7 +12,8 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
-  "include": ["src", "tests", "vitest.config.ts"]
+  "include": ["src", "tests", "examples/react", "vitest.config.ts"]
 }

@@ -25,6 +25,7 @@
     "build": "node build.mjs",
     "dev": "node scripts/dev.mjs",
     "serve": "node scripts/serve.mjs",
+    "demo:react": "npm run build && esbuild examples/react/index.tsx --bundle --jsx=automatic --outfile=examples/react/bundle.js --servedir=examples --serve=0.0.0.0:8085",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests",
     "test": "vitest run",
@@ -45,13 +46,17 @@
     "vanilla-js",
     "javascript"
   ],
-  "author": "",
+  "author": "codersantosh",
   "license": "MIT",
   "homepage": "https://github.com/codersantosh/acmeticker#readme",
   "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "esbuild": "^0.25.12",
     "eslint": "^9.39.5",
     "jsdom": "^26.1.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0",
     "vitest": "^3.2.7"
