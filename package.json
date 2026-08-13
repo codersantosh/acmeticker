@@ -1,31 +1,67 @@
 {
   "name": "acmeticker",
-  "version": "1.0.0",
-  "description": "js library",
-  "main": "Gruntfile.js",
+  "version": "2.0.0",
+  "description": "Vanilla JS news ticker with vertical, horizontal, marquee and typewriter modes. jQuery-free successor to the v1 jQuery plugin.",
+  "type": "module",
+  "main": "./dist/acmeticker.cjs",
+  "module": "./dist/acmeticker.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/acmeticker.esm.js",
+      "require": "./dist/acmeticker.cjs"
+    },
+    "./jquery": {
+      "types": "./dist/jquery.d.ts",
+      "import": "./dist/acmeticker.jquery.esm.js",
+      "require": "./dist/acmeticker.jquery.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./dist/acmeticker.jquery.*"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/acmethemes/acmeticker.git"
+    "url": "git+https://github.com/codersantosh/acmeticker.git"
   },
+  "keywords": [
+    "ticker",
+    "news-ticker",
+    "marquee",
+    "typewriter",
+    "slider",
+    "carousel",
+    "vanilla-js",
+    "javascript"
+  ],
   "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/acmethemes/acmeticker#readme",
+  "license": "MIT",
+  "homepage": "https://github.com/codersantosh/acmeticker#readme",
   "devDependencies": {
-    "autoprefixer": "^9.8.0",
-    "grunt": "^1.5.3",
-    "grunt-autoprefixer": "^3.0.4",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^3.0.0",
-    "grunt-contrib-sass": "^1.0.0",
-    "grunt-contrib-uglify-es": "^3.3.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-notify": "^0.4.5",
-    "grunt-postcss": "^0.9.0"
-  },
-  "dependencies": {
-    "postcss-cli": "^7.1.1"
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.5",
+    "jquery-legacy": "npm:jquery@^1.12.4",
+    "jquery-modern": "npm:jquery@^3.7.1",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "^3.2.7"
   }
 }

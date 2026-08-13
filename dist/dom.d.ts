@@ -1,0 +1,9 @@
+export declare function outerWidth(el: HTMLElement): number;
+export declare function outerHeight(el: HTMLElement): number;
+export declare function requestFrame(callback: FrameRequestCallback): number;
+export declare function cancelFrame(id: number): void;
+export declare function prefersReducedMotion(): boolean;
+export declare function createWrap(el: HTMLElement): HTMLElement;
+export declare function unwrap(el: HTMLElement, wrap: HTMLElement): void;
+export declare function directLiChildren(el: HTMLElement): Array<HTMLElement>;
+export declare function hideAllButFirst(el: HTMLElement): void;
