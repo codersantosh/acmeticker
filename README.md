@@ -113,7 +113,8 @@ Server-side rendering: importing the module is safe in Node (all DOM access is g
 | `type` | `'horizontal'` | `'vertical' \| 'horizontal' \| 'marquee' \| 'typewriter'` | Ticker engine. |
 | `autoplay` | `2000` | `number` | Vertical/horizontal: pause between transitions (recommended 4000). Typewriter: hold time after the text is fully revealed (recommended 2000). Not used by marquee. |
 | `speed` | `50` | `number` | Vertical/horizontal: transition duration in ms (recommended 600). Typewriter: delay per character in ms (recommended 50). Marquee: travel speed in px/ms (recommended 0.05). |
-| `direction` | `'up'` | `'up' \| 'down' \| 'left' \| 'right'` | `up`/`down` for vertical; `left`/`right` for horizontal and marquee. Not used by typewriter. |
+| `direction` | `'up'` | `'up' \| 'down' \| 'left' \| 'right'` | `up`/`down` for vertical; `left`/`right` for horizontal and marquee. Not used by typewriter. On RTL pages `left`/`right` are logical (see [Right-to-left](#right-to-left-rtl)). |
+| `rtl` | `'auto'` | `'auto' \| boolean` | `'auto'` mirrors `left`/`right` when the ticker is inside an RTL context; `true`/`false` force it on or off. |
 | `pauseOnFocus` | `true` | `boolean` | Pause while the ticker region has focus. |
 | `pauseOnHover` | `true` | `boolean` | Pause while the pointer is over the ticker. |
 | `controls` | `{ prev: '', next: '', toggle: '' }` | `object` | Control targets. Each accepts a CSS selector string, an `HTMLElement`, or a `NodeList`/array of elements. `prev`/`next` are not used by marquee (v1 parity). |
@@ -143,6 +144,19 @@ const ticker = new AcmeTicker(el, {
 ```
 
 ## API
+
+### Right-to-left (RTL)
+
+`direction` is **logical**: `left` and `right` follow the page's text direction. On RTL pages (`dir="rtl"` on the ticker, an ancestor, or `<html>`), horizontal and marquee tickers automatically mirror, so a default marquee scrolls in the reading direction of an Arabic or Hebrew page with no extra configuration:
+
+```js
+// Arabic page (dir="rtl"): scrolls right-to-left automatically
+new AcmeTicker(document.querySelector('.my-news-ticker'), { type: 'marquee' });
+```
+
+Detection respects `dir="auto"` and CSS `direction: rtl` too. The `rtl` option overrides detection (`rtl: true` forces mirroring on an LTR page; `rtl: false` forces physical direction on an RTL page). Vertical and typewriter tickers are direction-neutral and are never affected. In RTL, horizontal items rest on the label side (the box's right edge) and enter from off-screen, mirroring the LTR layout. In the example stylesheet, RTL pages also mirror the control layout: the label moves to the right (flexbox) and the controls flip to the left with right-side divider borders.
+
+Runnable demos: [`examples/rtl.html`](examples/rtl.html) (all four tickers auto-mirrored under `dir="rtl"`, plus an `rtl: false` override section) and the React RTL page at `examples/react/rtl.html`.
 
 ### Methods
 
@@ -174,6 +188,24 @@ document.addEventListener('acmeTickerToggle', (event) => {
   const { ticker, paused } = event.detail;
 });
 ```
+
+The event fires only when the ticker is toggled explicitly (via the toggle control or `toggle()`); hover/focus pauses do not emit it, and a ticker that starts paused (e.g. under `prefers-reduced-motion`) does not emit it at mount - the button glyph syncs after the first toggle. A common pattern is syncing the toggle button's icon with the paused state - the examples style a play glyph via an `.is-paused` class:
+
+```js
+document.addEventListener('acmeTickerToggle', (event) => {
+  const { ticker, paused } = event.detail;
+  const pauseBtn = ticker.closest('.at-ticker')?.querySelector('.at-ticker-pause');
+  pauseBtn?.classList.toggle('is-paused', paused);
+});
+```
+
+```css
+.at-ticker-controls button.at-ticker-pause.is-paused:before {
+  /* replace the pause bars with a play triangle */
+}
+```
+
+On RTL pages the example stylesheet mirrors the prev/next chevrons automatically (via `[dir="rtl"]` and `:dir(rtl)` selectors).
 
 - `acmeTickerCycle` - fired on `document` whenever the ticker completes a full pass through its items. `count` is the number of completed cycles since initialization (per instance; `update()` resets it). A cycle means: all items shown once for vertical/horizontal/typewriter (the initial item returns to the front), or one full list scroll for marquee. Manual `prev()`/`next()` navigation restarts the current pass, so it does not count toward a cycle:
 
@@ -213,6 +245,9 @@ Working demos for all four types live in the `examples/` folder. They load the g
 - `examples/horizontal.html`
 - `examples/marquee.html`
 - `examples/typewriter.html`
+- `examples/rtl.html` (all types under `dir="rtl"`, plus an `rtl: false` override)
+- `examples/react/index.html` (React demo - run `npm run demo:react`)
+- `examples/react/rtl.html` (React RTL demo - run `npm run demo:react`)
 
 The demos are styled with the [Atomic CSS](https://github.com/codersantosh/atomic-css) utility framework (`examples/atomic.min.css`, vendored - refresh it by re-copying from the atomic-css repo) plus a small ticker customization layer (`examples/at-ticker.css`) that defines component theme `--at-*` variables and glyph rules. The ticker animation itself needs no CSS. Open `examples/index.html` directly in a browser, or serve the repo root and visit `/examples/`.
 
@@ -299,6 +334,8 @@ npm run build      # dist/ bundles + type declarations (one-shot)
 ```
 
 `npm run dev` watches `src/`, regenerates the bundles and type declarations on every change, and serves the repo at `http://localhost:8080/` (set `PORT` to change the port).
+
+The React demo bundles (`examples/react/bundle.js`, `examples/react/rtl.js`) embed the shipped ESM build, so regenerate them after any `src/` change with `npm run demo:react` (or the two esbuild commands it runs).
 
 ## License
 

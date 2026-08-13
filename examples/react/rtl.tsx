@@ -78,7 +78,7 @@ function TickerSection({ title, label, options, pauseOnly = false }: TickerSecti
   );
 }
 
-function TickerDemo() {
+function RtlDemo() {
   return (
     <div className="at-ctnr" id="at-demos">
       <TickerSection
@@ -102,6 +102,11 @@ function TickerDemo() {
         label="Typewriter News"
         options={{ type: 'typewriter', speed: 50 }}
       />
+      <TickerSection
+        title="Horizontal Ticker (rtl: false)"
+        label="Horizontal News"
+        options={{ type: 'horizontal', direction: 'right', rtl: false, speed: 600 }}
+      />
     </div>
   );
 }
@@ -110,7 +115,7 @@ const container = document.getElementById('root');
 if (container) {
   createRoot(container).render(
     <StrictMode>
-      <TickerDemo />
+      <RtlDemo />
     </StrictMode>,
   );
 }

@@ -43,5 +43,12 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('acmeTickerToggle', (event) => {
+        const { ticker, paused } = event.detail;
+        const pauseBtn = ticker.closest('.at-ticker')?.querySelector('.at-ticker-pause');
+        pauseBtn?.classList.toggle('is-paused', paused);
+    });
+</script>
 </body>
 </html>

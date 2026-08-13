@@ -5,3 +5,4 @@ deploy
 .playwright-cli
 
 examples/react/bundle.js
+examples/react/rtl.js

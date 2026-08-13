@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>AcmeTicker - All Demos</title>
+    <title>AcmeTicker - RTL Demo</title>
     <link rel="stylesheet" href="./atomic.min.css">
     <link rel="stylesheet" href="./at-ticker.css">
     <style>
@@ -104,61 +104,54 @@
             <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
+
+    <h2 class="at-m">Horizontal Ticker (rtl: false)</h2>
+    <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="ticker-override">
+        <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Horizontal News</div>
+        <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+            <ul class="my-news-ticker">
+                <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                <li><a href="#">Season finale heads to extra time with the title still undecided</a></li>
+                <li><a href="#">Home prices steady as mortgage rates ease for the third straight month</a></li>
+                <li><a href="#">New downtown coffee roaster opens with weekend barista workshops</a></li>
+                <li><a href="#">Study links morning walks to sharper memory in older adults</a></li>
+                <li><a href="#">Airline adds direct summer flights between the two coastal cities</a></li>
+            </ul>
+        </div>
+        <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+            <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+        </div>
+    </div>
 </div>
 
 <script src="../dist/acmeticker.min.js"></script>
 <script>
-    const verticalEl = document.querySelector('#ticker-vertical .my-news-ticker');
-    if (verticalEl) {
-        new AcmeTicker(verticalEl, {
-            type: 'vertical',
-            direction: 'up',
-            speed: 600,
-            controls: {
-                prev: document.querySelector('#ticker-vertical .at-ticker-prev'),
-                next: document.querySelector('#ticker-vertical .at-ticker-next'),
-                toggle: document.querySelector('#ticker-vertical .at-ticker-pause')
-            }
-        });
-    }
-
-    const horizontalEl = document.querySelector('#ticker-horizontal .my-news-ticker');
-    if (horizontalEl) {
-        new AcmeTicker(horizontalEl, {
-            type: 'horizontal',
-            direction: 'right',
-            speed: 600,
-            controls: {
-                prev: document.querySelector('#ticker-horizontal .at-ticker-prev'),
-                next: document.querySelector('#ticker-horizontal .at-ticker-next'),
-                toggle: document.querySelector('#ticker-horizontal .at-ticker-pause')
-            }
-        });
-    }
-
-    const marqueeEl = document.querySelector('#ticker-marquee .my-news-ticker');
-    if (marqueeEl) {
-        new AcmeTicker(marqueeEl, {
-            type: 'marquee',
-            direction: 'left',
-            speed: 0.05,
-            controls: {
-                toggle: document.querySelector('#ticker-marquee .at-ticker-pause')
-            }
-        });
-    }
-
-    const typewriterEl = document.querySelector('#ticker-typewriter .my-news-ticker');
-    if (typewriterEl) {
-        new AcmeTicker(typewriterEl, {
-            type: 'typewriter',
-            speed: 50,
-            controls: {
-                prev: document.querySelector('#ticker-typewriter .at-ticker-prev'),
-                next: document.querySelector('#ticker-typewriter .at-ticker-next'),
-                toggle: document.querySelector('#ticker-typewriter .at-ticker-pause')
-            }
-        });
+    const sections = [
+        { id: 'ticker-vertical', options: { type: 'vertical', direction: 'up', speed: 600 } },
+        { id: 'ticker-horizontal', options: { type: 'horizontal', direction: 'right', speed: 600 } },
+        { id: 'ticker-marquee', options: { type: 'marquee', direction: 'left', speed: 0.05 } },
+        { id: 'ticker-typewriter', options: { type: 'typewriter', speed: 50 } },
+        { id: 'ticker-override', options: { type: 'horizontal', direction: 'right', rtl: false, speed: 600 } },
+    ];
+    for (const { id, options } of sections) {
+        const el = document.querySelector(`#${id} .my-news-ticker`);
+        if (!el) {
+            continue;
+        }
+        const controls = {
+            prev: document.querySelector(`#${id} .at-ticker-prev`),
+            next: document.querySelector(`#${id} .at-ticker-next`),
+            toggle: document.querySelector(`#${id} .at-ticker-pause`),
+        };
+        if (options.type === 'marquee') {
+            delete controls.prev;
+            delete controls.next;
+        }
+        new AcmeTicker(el, { ...options, controls });
     }
 </script>
 <script>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>AcmeTicker - React RTL Demo</title>
+    <link rel="stylesheet" href="../atomic.min.css">
+    <link rel="stylesheet" href="../at-ticker.css">
+    <style>
+        #at-demos h2 {
+            --at-m: 30px 0 5px;
+        }
+
+        #at-demos .at-ticker {
+            --at-m: 20px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="./rtl.js"></script>
+<script>
+    if (!document.getElementById('root').children.length) {
+        document.getElementById('root').innerHTML =
+            '<div style="padding:2rem;font:14px/1.6 system-ui,sans-serif;color:#333">' +
+            'The React demo bundle is missing. Run <code>npm run demo:react</code>, then reload this page.' +
+            '</div>';
+    }
+</script>
+</body>
+</html>

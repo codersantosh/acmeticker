@@ -55,6 +55,17 @@
   --at-bg-cl: #eee;
 }
 
+[dir='rtl'] .at-ticker-controls,
+.at-ticker-controls:dir(rtl) {
+  --at-r: auto;
+  --at-l: 0;
+}
+
+[dir='rtl'] .at-ticker-controls button,
+.at-ticker-controls button:dir(rtl) {
+  --at-bdr-w: 0 1px 0 0;
+}
+
 .at-ticker-controls button.at-ticker-arrow:after {
   content: '';
   position: absolute;
@@ -79,12 +90,30 @@
   transform: translate(-50%, -50%);
 }
 
+.at-ticker-controls button.at-ticker-pause.is-paused:before {
+  width: 0;
+  height: 0;
+  border-left: 10px solid #999;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
 .at-ticker-controls-horizontal button.at-ticker-prev:after {
   transform: translate(-50%, -50%) rotate(135deg);
 }
 
 .at-ticker-controls-horizontal button.at-ticker-next:after {
   transform: translate(-50%, -50%) rotate(315deg);
+}
+
+[dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-prev:after,
+.at-ticker-controls-horizontal button.at-ticker-prev:dir(rtl):after {
+  transform: translate(-50%, -50%) rotate(315deg);
+}
+
+[dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-next:after,
+.at-ticker-controls-horizontal button.at-ticker-next:dir(rtl):after {
+  transform: translate(-50%, -50%) rotate(135deg);
 }
 
 .at-ticker-controls-vertical button.at-ticker-prev:after {
