@@ -460,6 +460,9 @@ var VerticalHorizontalEngine = class {
     this.horizontal = host.options.type === "horizontal";
   }
   init() {
+    if (!this.horizontal) {
+      this.settle();
+    }
     if (!this.host.paused) {
       this.arm();
     }
@@ -558,13 +561,14 @@ var VerticalHorizontalEngine = class {
   }
   settle() {
     const ul = this.host.element;
+    const styleProp = this.styleProp();
     for (const li of directLiChildren(ul)) {
       li.style.opacity = "0";
       li.style.display = "none";
+      li.style[styleProp] = "";
     }
     const first = directLiChildren(ul)[0];
     if (first) {
-      const styleProp = this.styleProp();
       first.style.opacity = "1";
       first.style.position = "absolute";
       first.style.display = "block";
@@ -574,16 +578,22 @@ var VerticalHorizontalEngine = class {
   styleProp() {
     return this.horizontal ? "left" : "marginTop";
   }
+  visibleHeight() {
+    const box = this.host.wrap.parentElement;
+    if (!box) return 0;
+    const cs = getComputedStyle(box);
+    return box.clientHeight - (Number.parseFloat(cs.paddingTop) || 0) - (Number.parseFloat(cs.paddingBottom) || 0);
+  }
   animate(el) {
     const styleProp = this.styleProp();
     const negative = this.host.options.direction === "up" || this.host.options.direction === "right";
     el.style.display = "block";
-    const travel = this.horizontal ? outerWidth(el) : outerHeight(el);
-    const current = parseFloat(getComputedStyle(el)[styleProp]) || 0;
-    const from = negative ? current - travel : current + travel;
+    const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
+    const from = negative ? -travel : travel;
     for (const li of directLiChildren(this.host.element)) {
       li.style.opacity = "0";
       li.style.display = "none";
+      li.style[styleProp] = "";
     }
     el.style.opacity = "1";
     el.style.position = "absolute";

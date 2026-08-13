@@ -21,6 +21,7 @@ export declare class VerticalHorizontalEngine implements TickerEngine {
     private rotate;
     private settle;
     private styleProp;
+    private visibleHeight;
     private animate;
     private complete;
 }

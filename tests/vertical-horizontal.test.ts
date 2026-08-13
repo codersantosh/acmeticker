@@ -47,6 +47,23 @@ function hiddenExcept(ul: HTMLElement, visible: HTMLElement): void {
 }
 
 describe('vertical/horizontal engine', () => {
+  it('first item is rest-styled at init, not just after navigate', () => {
+    const { ul } = mount({ type: 'vertical' });
+    const first = ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
+    expect(first.style.position).toBe('absolute');
+    expect(first.style.display).toBe('block');
+    expect(first.style.opacity).toBe('1');
+    expect(first.style.marginTop).toBe('0px');
+  });
+
+  it('hidden items have no stale marginTop or left', () => {
+    const { ticker, ul } = mount({ type: 'vertical' });
+    ticker.next();
+    for (const li of Array.from(ul.querySelectorAll<HTMLElement>(':scope > li')).slice(1)) {
+      expect(li.style.marginTop).toBe('');
+    }
+  });
+
   it('rotates first li to the end and reveals the new first on each tick', () => {
     const { ul } = mount({ type: 'vertical', direction: 'up' });
 
@@ -337,7 +354,7 @@ describe('vertical/horizontal engine', () => {
     expect(ul.style.width).toBe('');
     expect(ul.style.position).toBe('');
     const after = Array.from(ul.querySelectorAll<HTMLElement>(':scope > li'));
-    expect(after[0]?.style.display).toBe('');
+    expect(after[0]?.style.display).toBe('block');
     for (const li of after.slice(1)) {
       expect(li.style.display).toBe('none');
     }
