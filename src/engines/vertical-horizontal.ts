@@ -20,9 +20,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
   }
 
   init(): void {
-    if (!this.horizontal) {
-      this.settle();
-    }
+    this.settle();
     if (!this.host.paused) {
       this.arm();
     }

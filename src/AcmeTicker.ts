@@ -17,6 +17,7 @@ export class AcmeTicker implements TickerHost {
   readonly options: AcmeTickerOptions;
   paused: boolean;
 
+  private explicitPaused = false;
   private engine: TickerEngine;
   private controls: ResolvedControls;
   private unbindControls: () => void;
@@ -31,6 +32,7 @@ export class AcmeTicker implements TickerHost {
     this.element = element;
     this.options = mergeOptions(options);
     this.paused = prefersReducedMotion();
+    this.explicitPaused = this.paused;
     this.wrap = createWrap(this.element);
     hideAllButFirst(this.element);
 
@@ -44,6 +46,7 @@ export class AcmeTicker implements TickerHost {
   }
 
   play(): void {
+    this.explicitPaused = false;
     if (!this.paused) {
       return;
     }
@@ -52,6 +55,7 @@ export class AcmeTicker implements TickerHost {
   }
 
   pause(): void {
+    this.explicitPaused = true;
     if (this.paused) {
       return;
     }
@@ -164,6 +168,9 @@ export class AcmeTicker implements TickerHost {
       } else {
         this.engine.resume();
       }
+      return;
+    }
+    if (this.explicitPaused) {
       return;
     }
     this.paused = paused;

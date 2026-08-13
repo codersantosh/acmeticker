@@ -40,6 +40,7 @@ All notable changes to AcmeTicker are documented here. The format follows [Keep 
 - Vertical and horizontal transitions now measure the newly current item while it is measurable, instead of reading zero dimensions from its hidden state.
 - Empty or single-item tickers degrade gracefully instead of throwing.
 - `speed <= 0` or empty lists no longer spin a degenerate infinite animation loop in marquee mode.
+- Explicitly paused (or reduced-motion-started) vertical/horizontal/typewriter tickers no longer resume when the pointer or focus leaves the ticker. Interaction pause and explicit pause are now tracked separately; marquee intentionally retains the v1 resume-on-leave behavior.
 
 ## [1.0.0] - 2019
 

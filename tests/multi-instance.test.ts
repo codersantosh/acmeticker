@@ -98,6 +98,70 @@ describe('multi-instance independence', () => {
     expect(b.paused).toBe(false);
   });
 
+  it('explicit pause survives mouseenter/mouseleave', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+
+    a.pause();
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new MouseEvent('mouseenter'));
+    aEl.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(a.paused).toBe(true);
+  });
+
+  it('toggle pause survives focusin/focusout', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+
+    a.toggle();
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new FocusEvent('focusin'));
+    aEl.dispatchEvent(new FocusEvent('focusout'));
+    expect(a.paused).toBe(true);
+  });
+
+  it('reduced-motion pause survives mouseleave', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query === '(prefers-reduced-motion: reduce)',
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+
+    expect(a.paused).toBe(true);
+    aEl.dispatchEvent(new MouseEvent('mouseenter'));
+    aEl.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(a.paused).toBe(true);
+
+    a.destroy();
+    window.matchMedia = original;
+  });
+
+  it('running ticker still pauses on hover and resumes on leave', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+
+    aEl.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(a.paused).toBe(false);
+  });
+
   it('emits the toggle event with the default paused state via public toggle()', () => {
     document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
     const aEl = document.getElementById('a') as HTMLElement;

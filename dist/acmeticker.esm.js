@@ -433,9 +433,7 @@ var VerticalHorizontalEngine = class {
     this.horizontal = host.options.type === "horizontal";
   }
   init() {
-    if (!this.horizontal) {
-      this.settle();
-    }
+    this.settle();
     if (!this.host.paused) {
       this.arm();
     }
@@ -642,6 +640,7 @@ var DEFAULTS = {
 var instances = /* @__PURE__ */ new WeakMap();
 var AcmeTicker = class {
   constructor(element, options) {
+    this.explicitPaused = false;
     const existing = instances.get(element);
     if (existing) {
       existing.destroy();
@@ -649,6 +648,7 @@ var AcmeTicker = class {
     this.element = element;
     this.options = mergeOptions(options);
     this.paused = prefersReducedMotion();
+    this.explicitPaused = this.paused;
     this.wrap = createWrap(this.element);
     hideAllButFirst(this.element);
     this.controls = resolveControls(this.options);
@@ -659,6 +659,7 @@ var AcmeTicker = class {
     this.engine.init();
   }
   play() {
+    this.explicitPaused = false;
     if (!this.paused) {
       return;
     }
@@ -666,6 +667,7 @@ var AcmeTicker = class {
     this.engine.resume();
   }
   pause() {
+    this.explicitPaused = true;
     if (this.paused) {
       return;
     }
@@ -762,6 +764,9 @@ var AcmeTicker = class {
       } else {
         this.engine.resume();
       }
+      return;
+    }
+    if (this.explicitPaused) {
       return;
     }
     this.paused = paused;
