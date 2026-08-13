@@ -6,21 +6,19 @@ All notable changes to AcmeTicker are documented here. The format follows [Keep 
 
 ### Breaking changes
 
-- **jQuery removed from the core.** AcmeTicker is now a zero-dependency vanilla JS library. Existing jQuery-based code keeps working through the compatibility shim (`dist/acmeticker.jquery.js`), but the shim is a compat-only bridge and may be dropped in a future major.
-- **New build/API surface.** The package ships ESM, CommonJS and UMD bundles plus TypeScript declarations. Vanilla usage is `new AcmeTicker(element, options)`; the old `$('.ticker').AcmeTicker(options)` pattern remains available via the shim.
-- **`acmeTickerToggle` event payload changed.** The event is still fired on `document`, but handlers now read `event.detail.ticker` and `event.detail.paused` instead of receiving them as extra positional arguments (a native `CustomEvent` cannot carry jQuery-style extra args). Code doing `$(document).on('acmeTickerToggle', function (e, ticker, paused) {...})` must switch to `e.detail`.
-- **jQuery shim initializes one instance per matched element.** v1 ran a single shared closure across the whole collection; v2 creates independent instances, matching the vanilla API and what consumers reasonably expect.
+- **jQuery fully removed - no compatibility shim.** AcmeTicker is a zero-dependency vanilla JS library. The old `$('.ticker').AcmeTicker(options)` pattern no longer exists; call sites must migrate to `new AcmeTicker(element, options)` (see the README migration guide).
+- **New build/API surface.** The package ships ESM, CommonJS and UMD bundles plus TypeScript declarations. Vanilla usage is `new AcmeTicker(element, options)`.
+- **`acmeTickerToggle` event payload changed.** The event is still fired on `document`, but handlers now read `event.detail.ticker` and `event.detail.paused` instead of receiving them as extra positional arguments. Code relying on the old extra-argument signature must switch to `e.detail`.
 - **IE11 support dropped.** v2 targets ES2020+ evergreen browsers (Chrome/Edge 80+, Firefox 78+, Safari 14+). Note that v1 never actually loaded in IE11 either - its source used ES6 syntax, so the plugin failed with a parse error before the ticker could run.
 
 ### New features
 
-- **`destroy()`** - removes the ticker and restores the DOM to its pre-init state (wrap removed, inline styles cleared, `data-text` attributes removed, typed text restored). This fixes the long-standing "how do I reinitiate the plugin?" problem.
+- **`destroy()`** - removes the ticker and clears all plugin-applied DOM changes (wrap removed, inline styles cleared, `data-text` attributes removed, typed text restored). This fixes the long-standing "how do I reinitiate the plugin?" problem.
 - **`update(options)`** - re-initializes an existing ticker with new options (including type changes) without a full teardown/re-mount.
 - **`play()`, `pause()`, `toggle()`, `next()`, `prev()`** - programmatic control, matching the click-handler semantics of the v1 controls.
 - **`acmeTickerCycle` event** - fired on `document` each time the ticker completes a full pass through its items, with a per-init cycle counter in `event.detail.count`. Fired after all items have been shown once for vertical/horizontal/typewriter and after each full list scroll for marquee.
 - **`autoplay: 0` now yields a continuous, interruption-free loop** for vertical/horizontal/typewriter - the next transition starts the moment the previous one finishes. This was impossible in v1, where `autoplay: 0` caused overlapping, corrupted animations.
 - **Marquee loop is now seamless.** v1 left a brief visible blank at each loop boundary; v2 duplicates the items internally so the window is never empty (duplicates are removed on `destroy()`).
-- **jQuery shim lifecycle methods.** `$('.ticker').AcmeTicker('destroy' | 'update' | 'play' | 'pause' | 'toggle' | 'next' | 'prev', ...)` drives the ticker from jQuery code without importing the class.
 - **ESM / CJS / UMD builds**, TypeScript types, and an `exports` map for modern bundlers.
 - **Accessibility:** tickers start paused under `prefers-reduced-motion` (playable on demand), and the ticker region is marked `aria-live="off"` / `role="region"`.
 - **Modern animation:** RAF-driven transitions instead of jQuery `animate`/`setInterval`; marquee now uses CSS transforms with no per-frame layout reads.
@@ -43,4 +41,4 @@ All notable changes to AcmeTicker are documented here. The format follows [Keep 
 
 ## [1.0.0] - 2019
 
-The original jQuery plugin. Archives of the v1 source remain at `assets/js/acmeticker.js` and `assets/js/acmeticker.min.js`.
+The original jQuery plugin. Archives of the v1 source were removed along with the v2 rewrite; the v1 plugin remains available in earlier git history.

@@ -1,6 +1,6 @@
 # AcmeTicker - News Ticker
 
-A lightweight, zero-dependency vanilla JS library for advanced news tickers. Successor to the v1 jQuery plugin: same four ticker types and options, modern animation (RAF), TypeScript types, and a compatibility shim for existing jQuery-based integrations.
+A lightweight, zero-dependency vanilla JS library for advanced news tickers. Successor to the v1 jQuery plugin: same four ticker types and options, modern animation (RAF), TypeScript types, and no jQuery anywhere.
 
 Demo: [Gutentor News Ticker](https://www.demo.gutentor.com/news-ticker/)
 
@@ -43,44 +43,6 @@ new AcmeTicker(document.querySelector('.my-news-ticker'), {
 ```
 
 The UMD build exposes a global `AcmeTicker` class (with `AcmeTicker.DEFAULTS` as a static property).
-
-### jQuery shim (legacy integrations)
-
-For existing WordPress themes/plugins and other code that still calls `$.fn.AcmeTicker`:
-
-```html
-<script src="jquery.js"></script>
-<script src="acmeticker.jquery.js"></script>
-<script>
-  jQuery(document).ready(function ($) {
-    $('.my-news-ticker').AcmeTicker({
-      type: 'horizontal',
-      direction: 'right',
-      controls: {
-        prev: $('.acme-news-ticker-prev'),
-        next: $('.acme-news-ticker-next'),
-        toggle: $('.acme-news-ticker-pause')
-      }
-    });
-  });
-</script>
-```
-
-The shim (`acmeticker.jquery.js`, or `acmeticker/jquery` for bundlers) auto-registers `$.fn.AcmeTicker` (plus `$.fn.AcmeTicker.defaults`) when jQuery is present. It is compat-only and may be dropped in a future major version.
-
-jQuery-based code can also drive the lifecycle without importing the class:
-
-```js
-$('.my-news-ticker').AcmeTicker('pause');
-$('.my-news-ticker').AcmeTicker('play');
-$('.my-news-ticker').AcmeTicker('toggle');
-$('.my-news-ticker').AcmeTicker('next');
-$('.my-news-ticker').AcmeTicker('prev');
-$('.my-news-ticker').AcmeTicker('update', { type: 'marquee' });
-$('.my-news-ticker').AcmeTicker('destroy');
-```
-
-Unknown method names are ignored; the collection is returned for chaining.
 
 ## Available Options
 
@@ -159,7 +121,7 @@ document.addEventListener('acmeTickerCycle', (event) => {
 });
 ```
 
-Both events are native `CustomEvent`s and also reach jQuery listeners registered via `$(document).on('acmeTickerToggle', ...)` / `$(document).on('acmeTickerCycle', ...)`.
+Both events are native `CustomEvent`s.
 
 ### Multiple instances
 
@@ -173,10 +135,12 @@ Multiple tickers on one page are independent. Creating a new ticker on an elemen
 
 ## Examples
 
-Working demos for all four types, in both integration styles, live in the `examples/` folder:
+Working demos for all four types live in the `examples/vanilla/` folder, using module scripts and `new AcmeTicker(...)`:
 
-- `examples/vanilla/` - module scripts using `new AcmeTicker(...)`
-- `examples/jquery/` - the jQuery shim pattern
+- `examples/vanilla/vertical.html`
+- `examples/vanilla/horizontal.html`
+- `examples/vanilla/marquee.html`
+- `examples/vanilla/typewriter.html`
 
 Serve the repo root with any static server (module scripts require HTTP) and open e.g. `examples/vanilla/vertical.html`.
 
@@ -186,21 +150,39 @@ AcmeTicker targets ES2020+ evergreen browsers: Chrome and Edge 80+, Firefox 78+,
 
 ## Migrating from v1
 
-v1 was a jQuery plugin (`$('.ticker').AcmeTicker({...})`). The v2 core is vanilla JS, but the observable behavior is preserved with a small number of documented differences:
+v1 was a jQuery plugin (`$('.ticker').AcmeTicker({...})`). **v2 is vanilla-only - jQuery is fully removed and no `$.fn.AcmeTicker` shim exists.** Existing jQuery-based call sites (WordPress themes/plugins, Gutentor's News Ticker block) must migrate to the class API:
 
-1. **jQuery is no longer required.** Use `new AcmeTicker(el, options)` (import from `acmeticker`, or the UMD global). The jQuery shim keeps old call sites working.
-2. **Controls accept more than jQuery objects.** v1 crashed on selector strings; v2 accepts selectors, elements and NodeLists. Passing jQuery objects (as v1 code does) keeps working via the shim.
+```js
+// v1
+jQuery(document).ready(function ($) {
+  $('.my-news-ticker').AcmeTicker({
+    type: 'horizontal',
+    direction: 'right',
+    controls: { prev: $('.prev'), next: $('.next'), toggle: $('.pause') }
+  });
+});
+
+// v2
+new AcmeTicker(document.querySelector('.my-news-ticker'), {
+  type: 'horizontal',
+  direction: 'right',
+  controls: { prev: '.prev', next: '.next', toggle: '.pause' }
+});
+```
+
+The observable behavior is preserved with a small number of documented differences:
+
+1. **jQuery is fully removed.** Use `new AcmeTicker(el, options)` (import from `acmeticker`, or the UMD global). There is no shim, so jQuery-based initialization must be replaced with the class API above.
+2. **Controls accept selectors, elements and NodeLists.** v1 required jQuery objects and crashed on selector strings; v2 accepts all of them.
 3. **`acmeTickerToggle` payload.** The event still fires on `document`, but the ticker/paused values moved from extra positional arguments to `event.detail` (`{ ticker, paused }`).
 4. **Typewriter pause actually pauses.** v1 kept typing while paused and the text blinked on resume; v2 freezes the reveal and resumes from the exact character.
 5. **`prev`/`next` while paused are no-ops** (a quirk carried from v1 - do not rely on it).
 6. **`destroy()`/`update()` clear `data-text`.** v2 owns the `data-text` attribute for its lifecycle and removes it (restoring the full text) on teardown. Do not stash your own `data-text` on ticker items while a ticker is mounted.
 7. **Marquee resume is position-exact.** v1's resume-from-pause could drift when the ticker was not at page x=0; v2 is correct at any page position.
-8. **One instance per element.** The v1 shim ran one shared closure across the whole matched collection; v2 creates independent instances per element (matching the vanilla API).
-9. **New lifecycle API.** `destroy()` and `update()` are new - there was no clean way to reinit or tear down in v1.
-10. **Transition cadence carried from v1.** Vertical/horizontal/typewriter wait a full `autoplay` between transitions by default; use `autoplay: 0` for a continuous loop (impossible in v1, where it corrupted the animations).
-11. **New `acmeTickerCycle` event.** v1 had no cycle-completion signal; v2 fires one per full pass (see Events).
-12. **Marquee loop is seamless.** v1 showed a brief blank at each loop boundary; v2 duplicates the items internally so the loop is continuous (duplicates are removed on `destroy()` - do not rely on the marquee item count in the DOM while mounted).
-13. **jQuery lifecycle methods.** The shim supports `$('.ticker').AcmeTicker('destroy'|'update'|'play'|'pause'|'toggle'|'next'|'prev', ...)` for jQuery-based code that cannot import the class.
+8. **New lifecycle API.** `destroy()` and `update()` are new - there was no clean way to reinit or tear down in v1.
+9. **Transition cadence carried from v1.** Vertical/horizontal/typewriter wait a full `autoplay` between transitions by default; use `autoplay: 0` for a continuous loop (impossible in v1, where it corrupted the animations).
+10. **New `acmeTickerCycle` event.** v1 had no cycle-completion signal; v2 fires one per full pass (see Events).
+11. **Marquee loop is seamless.** v1 showed a brief blank at each loop boundary; v2 duplicates the items internally so the loop is continuous (duplicates are removed on `destroy()` - do not rely on the marquee item count in the DOM while mounted).
 
 ## Development
 

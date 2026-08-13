@@ -12,16 +12,9 @@
       "import": "./dist/acmeticker.esm.js",
       "require": "./dist/acmeticker.cjs"
     },
-    "./jquery": {
-      "types": "./dist/jquery.d.ts",
-      "import": "./dist/acmeticker.jquery.esm.js",
-      "require": "./dist/acmeticker.jquery.cjs"
-    },
     "./package.json": "./package.json"
   },
-  "sideEffects": [
-    "./dist/acmeticker.jquery.*"
-  ],
+  "sideEffects": false,
   "files": [
     "dist",
     "README.md",
@@ -57,8 +50,6 @@
   "devDependencies": {
     "esbuild": "^0.25.12",
     "eslint": "^9.39.5",
-    "jquery-legacy": "npm:jquery@^1.12.4",
-    "jquery-modern": "npm:jquery@^3.7.1",
     "jsdom": "^26.1.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0",

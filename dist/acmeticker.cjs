@@ -21,8 +21,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   AcmeTicker: () => AcmeTicker,
-  DEFAULTS: () => DEFAULTS,
-  registerJqueryShim: () => registerJqueryShim
+  DEFAULTS: () => DEFAULTS
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -799,38 +798,5 @@ function mergeOptions(options) {
       ...options?.controls
     }
   };
-}
-
-// src/jquery-adapter.ts
-var instances2 = /* @__PURE__ */ new WeakMap();
-function registerJqueryShim(jQuery) {
-  if (!jQuery || typeof jQuery.fn === "undefined") {
-    return;
-  }
-  const jq = jQuery;
-  const plugin = function(methodOrOptions, ...args) {
-    const collection = this;
-    if (typeof collection.each !== "function") {
-      return void 0;
-    }
-    return collection.each(function() {
-      if (typeof methodOrOptions === "string") {
-        const instance = instances2.get(this);
-        if (instance) {
-          const method = instance[methodOrOptions];
-          if (typeof method === "function") {
-            method.apply(instance, args);
-          }
-          if (methodOrOptions === "destroy") {
-            instances2.delete(this);
-          }
-        }
-        return;
-      }
-      instances2.set(this, new AcmeTicker(this, methodOrOptions));
-    });
-  };
-  Object.assign(plugin, { defaults: { ...DEFAULTS } });
-  jq.fn.AcmeTicker = plugin;
 }
 //# sourceMappingURL=acmeticker.cjs.map

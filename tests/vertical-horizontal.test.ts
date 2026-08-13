@@ -497,7 +497,7 @@ describe('autoplay: 0 continuous loop', () => {
   });
 });
 
-describe('swing easing parity with jQuery v1 (0.5 - Math.cos(p * Math.PI) / 2)', () => {
+describe('swing easing parity with v1 (0.5 - Math.cos(p * Math.PI) / 2)', () => {
   const swing = (p: number): number => 0.5 - Math.cos(p * Math.PI) / 2;
   const samples = [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1];
 

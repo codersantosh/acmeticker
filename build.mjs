@@ -38,23 +38,11 @@ const builds = [
   },
 ];
 
-const jqueryEntry = 'src/jquery.ts';
-
-const jqueryBuilds = [
-  { format: 'esm', outfile: 'dist/acmeticker.jquery.esm.js' },
-  { format: 'cjs', outfile: 'dist/acmeticker.jquery.cjs' },
-  { format: 'iife', outfile: 'dist/acmeticker.jquery.js' },
-  { format: 'iife', minify: true, outfile: 'dist/acmeticker.jquery.min.js' },
-];
-
 async function main() {
   rmSync('dist', { recursive: true, force: true });
 
   for (const target of builds) {
     await build({ ...shared, entryPoints: [entry], ...target });
-  }
-  for (const target of jqueryBuilds) {
-    await build({ ...shared, entryPoints: [jqueryEntry], ...target });
   }
 
   if (!watch) {
