@@ -1,13 +1,8 @@
-import { build } from 'esbuild';
-import { execSync } from 'node:child_process';
+import { context } from 'esbuild';
+import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
-
-const shared = {
-  bundle: true,
-  sourcemap: true,
-  target: 'es2020',
-  logLevel: 'info',
-};
+import { join } from 'node:path';
+import { startServer } from './serve.mjs';
 
 const entry = 'src/index.ts';
 
@@ -34,14 +29,39 @@ const builds = [
   },
 ];
 
+const shared = {
+  bundle: true,
+  sourcemap: true,
+  target: 'es2020',
+  logLevel: 'info',
+};
+
 async function main() {
   rmSync('dist', { recursive: true, force: true });
 
+  const contexts = [];
   for (const target of builds) {
-    await build({ ...shared, entryPoints: [entry], ...target });
+    const ctx = await context({ ...shared, entryPoints: [entry], ...target });
+    await ctx.watch();
+    contexts.push(ctx);
   }
 
-  execSync('npx tsc -p tsconfig.build.json', { stdio: 'inherit' });
+  const tscPath = join(process.cwd(), 'node_modules', 'typescript', 'bin', 'tsc');
+  const tsc = spawn(
+    process.execPath,
+    [tscPath, '-p', 'tsconfig.build.json', '--watch', '--preserveWatchOutput'],
+    { stdio: 'inherit' },
+  );
+
+  startServer();
+
+  const shutdown = async () => {
+    await Promise.all(contexts.map((ctx) => ctx.dispose()));
+    tsc.kill('SIGINT');
+    process.exit(0);
+  };
+  process.on('SIGINT', () => void shutdown());
+  process.on('SIGTERM', () => void shutdown());
 }
 
 main().catch((error) => {

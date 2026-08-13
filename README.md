@@ -26,9 +26,9 @@ new AcmeTicker(document.querySelector('.my-news-ticker'), {
   type: 'vertical',
   speed: 600,
   controls: {
-    prev: '.acme-news-ticker-prev',
-    next: '.acme-news-ticker-next',
-    toggle: '.acme-news-ticker-pause'
+    prev: '.at-ticker-prev',
+    next: '.at-ticker-next',
+    toggle: '.at-ticker-pause'
   }
 });
 ```
@@ -36,13 +36,67 @@ new AcmeTicker(document.querySelector('.my-news-ticker'), {
 ### Plain script tag (no bundler)
 
 ```html
-<script src="acmeticker.umd.js"></script>
+<script src="acmeticker.min.js"></script>
 <script>
   new AcmeTicker(document.querySelector('.my-news-ticker'), { type: 'horizontal', direction: 'right' });
 </script>
 ```
 
-The UMD build exposes a global `AcmeTicker` class (with `AcmeTicker.DEFAULTS` as a static property).
+The global build exposes an `AcmeTicker` class on `window` (with `AcmeTicker.DEFAULTS` as a static property).
+
+## React and other frameworks
+
+AcmeTicker is framework-agnostic - it is vanilla JS with no dependencies and works anywhere you can reach a real DOM element. `sideEffects: false` keeps it tree-shakeable, and TypeScript declarations ship with the package.
+
+React:
+
+```jsx
+import { useEffect, useRef } from 'react';
+import { AcmeTicker } from 'acmeticker';
+
+function NewsTicker() {
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    const ticker = new AcmeTicker(listRef.current, { type: 'vertical', speed: 600 });
+    return () => ticker.destroy(); // clear timers, RAF and listeners on unmount
+  }, []);
+
+  return (
+    <ul ref={listRef}>
+      <li>First headline</li>
+      <li>Second headline</li>
+    </ul>
+  );
+}
+```
+
+Vue:
+
+```js
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { AcmeTicker } from 'acmeticker';
+
+const list = ref(null);
+let ticker;
+onMounted(() => { ticker = new AcmeTicker(list.value, { type: 'marquee' }); });
+onBeforeUnmount(() => ticker?.destroy());
+```
+
+Svelte:
+
+```svelte
+<script>
+  import { onMount } from 'svelte';
+  import { AcmeTicker } from 'acmeticker';
+  let list;
+  onMount(() => { const t = new AcmeTicker(list, { type: 'horizontal' }); return () => t.destroy(); });
+</script>
+
+<ul bind:this={list}><li>One</li><li>Two</li></ul>
+```
+
+Server-side rendering: importing the module is safe in Node (all DOM access is guarded), but create the ticker only in a client lifecycle hook (`useEffect` / `onMounted` / `onMount`), and always call `destroy()` when the component unmounts.
 
 ## Available Options
 
@@ -73,9 +127,9 @@ const ticker = new AcmeTicker(el, {
   pauseOnFocus: true,
   pauseOnHover: true,
   controls: {
-    prev: document.querySelector('.acme-news-ticker-prev'),
-    next: document.querySelector('.acme-news-ticker-next'),
-    toggle: document.querySelector('.acme-news-ticker-pause')
+    prev: document.querySelector('.at-ticker-prev'),
+    next: document.querySelector('.at-ticker-next'),
+    toggle: document.querySelector('.at-ticker-pause')
   }
 });
 ```
@@ -135,14 +189,54 @@ Multiple tickers on one page are independent. Creating a new ticker on an elemen
 
 ## Examples
 
-Working demos for all four types live in the `examples/vanilla/` folder, using module scripts and `new AcmeTicker(...)`:
+Working demos for all four types live in the `examples/` folder. They load the global build like a WordPress-enqueued script:
 
-- `examples/vanilla/vertical.html`
-- `examples/vanilla/horizontal.html`
-- `examples/vanilla/marquee.html`
-- `examples/vanilla/typewriter.html`
+```html
+<script src="../dist/acmeticker.min.js"></script>
+<script>
+  document.querySelectorAll('.my-news-ticker').forEach((el) => {
+    new AcmeTicker(el, { type: 'vertical', speed: 600 });
+  });
+</script>
+```
 
-Serve the repo root with any static server (module scripts require HTTP) and open e.g. `examples/vanilla/vertical.html`.
+- `examples/index.html` (all types on a single page)
+- `examples/vertical.html`
+- `examples/horizontal.html`
+- `examples/marquee.html`
+- `examples/typewriter.html`
+
+The demos are styled with the [Atomic CSS](https://github.com/codersantosh/atomic-css) utility framework (`examples/atomic.min.css`, vendored - refresh it by re-copying from the atomic-css repo) plus a small ticker customization layer (`examples/at-ticker.css`) that defines component theme `--at-*` variables and glyph rules. The ticker animation itself needs no CSS. Open `examples/index.html` directly in a browser, or serve the repo root and visit `/examples/`.
+
+## Styling
+
+The engines apply all animation mechanics as inline styles (positioning, display, opacity, `margin-top`/`left` offsets, `transform`, list width), so no library CSS is loaded. As a consumer you only need to provide:
+
+- a container with a fixed `height` and `overflow: hidden` (otherwise slide/typewriter effects have no visible boundary), and
+- whatever look-and-feel you want for the ticker bar, label and controls.
+
+The demo pattern (matching the Atomic CSS convention of utility-first markup plus component `--at-*` CSS variables) is a good starting point: layout comes from Atomic CSS utilities, and custom theming is controlled via `--at-*` CSS variables defined in `at-ticker.css`:
+
+```html
+<link rel="stylesheet" href="atomic.min.css">
+<link rel="stylesheet" href="at-ticker.css">
+
+<div class="at-ctnr">
+  <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg">
+    <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">News</div>
+    <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1">
+      <ul class="my-news-ticker">...</ul>
+    </div>
+    <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx">
+      <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
+      <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
+      <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
+    </div>
+  </div>
+</div>
+```
+
+Re-theming is as simple as overriding the scoped `--at-*` CSS variables in `at-ticker.css`. Controls are plain `<button>`s referenced through the `controls` option (`'.at-ticker-prev'`, `'.at-ticker-next'`, `'.at-ticker-pause'`). Nothing else is required for the ticker to work.
 
 ## Browser support
 
@@ -172,7 +266,7 @@ new AcmeTicker(document.querySelector('.my-news-ticker'), {
 
 The observable behavior is preserved with a small number of documented differences:
 
-1. **jQuery is fully removed.** Use `new AcmeTicker(el, options)` (import from `acmeticker`, or the UMD global). There is no shim, so jQuery-based initialization must be replaced with the class API above.
+1. **jQuery is fully removed.** Use `new AcmeTicker(el, options)` (import from `acmeticker`, or the global build). There is no shim, so jQuery-based initialization must be replaced with the class API above.
 2. **Controls accept selectors, elements and NodeLists.** v1 required jQuery objects and crashed on selector strings; v2 accepts all of them.
 3. **`acmeTickerToggle` payload.** The event still fires on `document`, but the ticker/paused values moved from extra positional arguments to `event.detail` (`{ ticker, paused }`).
 4. **Typewriter pause actually pauses.** v1 kept typing while paused and the text blinked on resume; v2 freezes the reveal and resumes from the exact character.
@@ -188,12 +282,15 @@ The observable behavior is preserved with a small number of documented differenc
 
 ```bash
 npm install
-npm run dev        # esbuild watch
+npm run dev        # watch src/, rebuild bundles + types, and serve the examples at localhost:8080
+npm run serve      # static server for the examples only
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 npm run test       # vitest (jsdom)
-npm run build      # dist/ bundles + type declarations
+npm run build      # dist/ bundles + type declarations (one-shot)
 ```
+
+`npm run dev` watches `src/`, regenerates the bundles and type declarations on every change, and serves the repo at `http://localhost:8080/` (set `PORT` to change the port).
 
 ## License
 

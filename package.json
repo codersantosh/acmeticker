@@ -23,7 +23,8 @@
   ],
   "scripts": {
     "build": "node build.mjs",
-    "dev": "node build.mjs --watch",
+    "dev": "node scripts/dev.mjs",
+    "serve": "node scripts/serve.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests",
     "test": "vitest run",
