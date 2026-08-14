@@ -3,6 +3,16 @@ name: Publish to npm
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run - validate everything without publishing'
+        required: false
+        default: 'false'
+      version:
+        description: 'Version tag for manual runs, e.g. v2.0.0'
+        required: false
+        default: ''
 
 jobs:
   publish:
@@ -12,10 +22,10 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - name: Checkout Release Tag
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.version || '' }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -27,21 +37,40 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Version Guard Verification
+      - name: Preflight validation
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name || inputs.version || '' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          TAG_NAME="${{ github.event.release.tag_name }}"
-          TAG_VERSION="${TAG_NAME#v}"
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Version mismatch: package.json ($PKG_VERSION) != Release Tag ($TAG_VERSION)" >&2
+          set -euo pipefail
+          V="${TAG_NAME#v}"
+          if [[ ! "$V" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "::error::VERSION='$TAG_NAME' is not a valid semver tag"
             exit 1
           fi
-          echo "Verified release version: $PKG_VERSION"
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PKG_VERSION" != "$V" ]]; then
+            echo "::error::Version mismatch: package.json ($PKG_VERSION) != tag ($V)"
+            exit 1
+          fi
+          if [[ "$DRY_RUN" != "true" && -z "$NODE_AUTH_TOKEN" ]]; then
+            echo "::error::NPM_TOKEN secret is not set"
+            exit 1
+          fi
+          echo "✓ Preflight passed for v$PKG_VERSION (dry_run=$DRY_RUN)"
 
       - name: Run Quality Gate Checks
         run: npm run typecheck && npm run lint && npm run test
 
       - name: Publish Package to npm
-        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "→ DRY RUN: validating package without publishing"
+            npm publish --dry-run
+          else
+            npm publish --provenance --access public
+          fi
