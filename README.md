@@ -255,33 +255,44 @@ The demos are styled with the [Atomic CSS](https://github.com/codersantosh/atomi
 
 ## Styling
 
-The engines apply all animation mechanics as inline styles (positioning, display, opacity, `margin-top`/`left` offsets, `transform`, list width), so no library CSS is loaded. As a consumer you only need to provide:
+The engines apply all animation mechanics as inline styles (positioning, display, opacity, `margin-top`/`left` offsets, `transform`, list width), so no library CSS is strictly required for JavaScript execution. As a consumer you only need to provide:
 
 - a container with a fixed `height` and `overflow: hidden` (otherwise slide/typewriter effects have no visible boundary), and
 - whatever look-and-feel you want for the ticker bar, label and controls.
 
-The demo pattern (matching the Atomic CSS convention of utility-first markup plus component `--at-*` CSS variables) is a good starting point: layout comes from Atomic CSS utilities, and custom theming is controlled via `--at-*` CSS variables defined in `at-ticker.css`:
+### Portable Ticker CSS Bundle
+
+For production-ready styling out of the box, the ticker component is portable as a pair:
+1. **`atomic.min.css`** — the lightweight utility framework ([Atomic CSS](https://github.com/codersantosh/atomic-css), vendored in [`examples/atomic.min.css`](examples/atomic.min.css)).
+2. **`at-ticker.css`** — the ticker component stylesheet ([`examples/at-ticker.css`](examples/at-ticker.css)) defining scoped `--at-*` CSS variables, control button glyphs (arrows, pause/play toggle), and automatic RTL layout mirroring.
+
+You can copy both files into your project or load them directly:
 
 ```html
-<link rel="stylesheet" href="atomic.min.css">
-<link rel="stylesheet" href="at-ticker.css">
+<!-- Portable Atomic CSS + Ticker CSS pair -->
+<link rel="stylesheet" href="examples/atomic.min.css">
+<link rel="stylesheet" href="examples/at-ticker.css">
 
 <div class="at-ctnr">
   <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg">
     <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">News</div>
-    <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1">
-      <ul class="my-news-ticker">...</ul>
+    <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+      <ul class="my-news-ticker">
+        <li><a href="#">First headline</a></li>
+        <li><a href="#">Second headline</a></li>
+      </ul>
     </div>
-    <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx">
-      <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
-      <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
-      <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p"></button>
+    <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+      <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+      <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+      <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
     </div>
   </div>
 </div>
 ```
 
-Re-theming is as simple as overriding the scoped `--at-*` CSS variables in `at-ticker.css`. Controls are plain `<button>`s referenced through the `controls` option (`'.at-ticker-prev'`, `'.at-ticker-next'`, `'.at-ticker-pause'`). Nothing else is required for the ticker to work.
+Re-theming is as simple as overriding the scoped `--at-*` CSS variables in `at-ticker.css` (e.g. `--at-bg-cl`, `--at-bdr-cl`, `--at-h`). Controls are plain `<button>`s referenced through the `controls` option (`'.at-ticker-prev'`, `'.at-ticker-next'`, `'.at-ticker-pause'`). RTL layout mirrors automatically under `dir="rtl"` without additional configuration.
+
 
 ## Browser support
 
