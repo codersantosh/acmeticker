@@ -1,8 +1,10 @@
 # AcmeTicker - News Ticker
 
+[![Live demo](https://img.shields.io/badge/live%20demo-github%20pages-1974d2)](https://codersantosh.github.io/acmeticker/)
+
 A lightweight, zero-dependency vanilla JS library for advanced news tickers. Successor to the v1 jQuery plugin: same four ticker types and options, modern animation (RAF), TypeScript types, and no jQuery anywhere.
 
-Demo: [Gutentor News Ticker](https://www.demo.gutentor.com/news-ticker/)
+Demo: [Gutentor News Ticker](https://www.demo.gutentor.com/news-ticker/) &middot; [Live examples](https://codersantosh.github.io/acmeticker/examples/index.html)
 
 ## Ticker Types
 
@@ -240,14 +242,14 @@ Working demos for all four types live in the `examples/` folder. They load the g
 </script>
 ```
 
-- `examples/index.html` (all types on a single page)
-- `examples/vertical.html`
-- `examples/horizontal.html`
-- `examples/marquee.html`
-- `examples/typewriter.html`
-- `examples/rtl.html` (all types under `dir="rtl"`, plus an `rtl: false` override)
-- `examples/react/index.html` (React demo - run `npm run demo:react`)
-- `examples/react/rtl.html` (React RTL demo - run `npm run demo:react`)
+- [All types on a single page](https://codersantosh.github.io/acmeticker/examples/index.html) (`examples/index.html` locally)
+- [Vertical](https://codersantosh.github.io/acmeticker/examples/vertical.html)
+- [Horizontal](https://codersantosh.github.io/acmeticker/examples/horizontal.html)
+- [Marquee](https://codersantosh.github.io/acmeticker/examples/marquee.html)
+- [Typewriter](https://codersantosh.github.io/acmeticker/examples/typewriter.html)
+- [Arabic / RTL demo](https://codersantosh.github.io/acmeticker/examples/rtl.html) (all types under `dir="rtl"`, plus an `rtl: false` override)
+- [React demo](https://codersantosh.github.io/acmeticker/examples/react/index.html) (run `npm run demo:react` for the local version)
+- [React RTL demo](https://codersantosh.github.io/acmeticker/examples/react/rtl.html) (run `npm run demo:react` for the local version)
 
 The demos are styled with the [Atomic CSS](https://github.com/codersantosh/atomic-css) utility framework (`examples/atomic.min.css`, vendored - refresh it by re-copying from the atomic-css repo) plus a small ticker customization layer (`examples/at-ticker.css`) that defines component theme `--at-*` variables and glyph rules. The ticker animation itself needs no CSS. Open `examples/index.html` directly in a browser, or serve the repo root and visit `/examples/`.
 

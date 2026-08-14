@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231974d2%22/><rect x=%226%22 y=%2210%22 width=%2220%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2217%22 width=%2214%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2224%22 width=%2218%22 height=%223%22 fill=%22white%22/></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>AcmeTicker - Vanilla JS News Ticker</title>
+    <link rel="stylesheet" href="examples/atomic.min.css">
+    <link rel="stylesheet" href="examples/at-ticker.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            margin: 0;
+            background: #f6f8fb;
+        }
+
+        .at-doc {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .at-doc h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+            color: #1a1a1a;
+        }
+
+        .at-doc .at-tagline {
+            margin: 0 0 18px;
+            color: #555;
+        }
+
+        .at-doc .at-links a {
+            color: #1974d2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .at-doc .at-links a:hover {
+            text-decoration: underline;
+        }
+
+        .at-doc h2 {
+            --at-m: 40px 0 10px;
+            font-size: 20px;
+            color: #1a1a1a;
+        }
+
+        .at-doc ul.at-demo-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .at-doc ul.at-demo-list li {
+            margin: 6px 0;
+        }
+
+        .at-doc ul.at-demo-list a {
+            color: #1974d2;
+            text-decoration: none;
+        }
+
+        .at-doc ul.at-demo-list a:hover {
+            text-decoration: underline;
+        }
+
+        .at-doc .at-muted {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .at-doc pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 14px 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+
+        .at-doc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        .at-doc .at-demo-wrap {
+            margin: 0 0 26px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="at-doc">
+    <h1>AcmeTicker</h1>
+    <p class="at-tagline">A zero-dependency vanilla JS news ticker with vertical, horizontal, marquee and typewriter modes, full RTL support, and a jQuery-free successor to the v1 plugin.</p>
+    <p class="at-links">
+        <a href="https://github.com/codersantosh/acmeticker">GitHub</a> &middot;
+        <a href="https://www.npmjs.com/package/acmeticker">npm</a> &middot;
+        <a href="https://github.com/codersantosh/acmeticker/blob/master/README.md">Documentation</a>
+    </p>
+
+    <h2>Live preview</h2>
+    <div class="at-demo-wrap">
+        <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="ticker-preview">
+            <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Latest</div>
+            <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                <ul class="my-news-ticker">
+                    <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                    <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                    <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                    <li><a href="#">Season finale heads to extra time with the title still undecided</a></li>
+                </ul>
+            </div>
+            <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+                <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" aria-label="Toggle playback"></button>
+            </div>
+        </div>
+    </div>
+
+    <h2>Live demos</h2>
+    <ul class="at-demo-list">
+        <li><a href="examples/index.html">All four types</a> (vertical, horizontal, marquee, typewriter)</li>
+        <li><a href="examples/vertical.html">Vertical ticker</a></li>
+        <li><a href="examples/horizontal.html">Horizontal ticker</a></li>
+        <li><a href="examples/marquee.html">Marquee</a></li>
+        <li><a href="examples/typewriter.html">Typewriter</a></li>
+        <li><a href="examples/rtl.html">Arabic / RTL demo</a> (with an <code>rtl: false</code> override)</li>
+        <li><a href="examples/react/index.html">React demo</a></li>
+        <li><a href="examples/react/rtl.html">React RTL demo</a></li>
+    </ul>
+
+    <h2>Quick start</h2>
+    <pre><code>npm install acmeticker</code></pre>
+    <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/acmeticker@2.0.0/dist/acmeticker.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  new AcmeTicker(document.querySelector('.my-news-ticker'), { type: 'horizontal' });
+&lt;/script&gt;</code></pre>
+
+    <p class="at-muted">
+        MIT License &middot;
+        <a href="https://github.com/codersantosh/acmeticker/blob/master/CHANGELOG.md">Changelog</a> &middot;
+        <a href="https://github.com/codersantosh/acmeticker/blob/master/LICENSE">License</a>
+    </p>
+</div>
+
+<script src="dist/acmeticker.min.js"></script>
+<script>
+    const preview = document.querySelector('#ticker-preview .my-news-ticker');
+    if (preview) {
+        const ticker = new AcmeTicker(preview, {
+            type: 'horizontal',
+            direction: 'right',
+            speed: 600,
+            controls: {
+                toggle: document.querySelector('#ticker-preview .at-ticker-pause')
+            }
+        });
+        document.querySelector('#ticker-preview .at-ticker-pause')?.classList.toggle('is-paused', ticker.paused);
+    }
+    document.addEventListener('acmeTickerToggle', (event) => {
+        const { ticker, paused } = event.detail;
+        const pauseBtn = ticker.closest('.at-ticker')?.querySelector('.at-ticker-pause');
+        pauseBtn?.classList.toggle('is-paused', paused);
+    });
+</script>
+</body>
+</html>
