@@ -108,6 +108,22 @@ describe('typewriter engine', () => {
     expect(first.querySelector('span')?.textContent).toBe('Badge');
   });
 
+  it('destroy restores nested siblings exactly without duplicating text (F-07)', () => {
+    document.body.innerHTML =
+      '<ul id="t"><li><a href="#">Alpha</a><span>Badge</span></li><li><a href="#">Beta</a></li></ul>';
+    const ul = document.getElementById('t') as HTMLElement;
+    const ticker = new AcmeTicker(ul, { type: 'typewriter', speed: SPEED, autoplay: AUTOPLAY });
+
+    vi.advanceTimersByTime(3 * SPEED);
+    ticker.destroy();
+
+    const first = liAt(ul, 0);
+    expect(first.querySelector('a')?.textContent).toBe('Alpha');
+    expect(first.querySelector('span')?.textContent).toBe('Badge');
+    expect(first.textContent).toBe('AlphaBadge');
+    expect(first.hasAttribute('data-text')).toBe(false);
+  });
+
   it('pause freezes the character count and resume continues from that exact count', () => {
     const { ticker, ul } = mount();
 

@@ -1,6 +1,6 @@
-import { cancelFrame, directLiChildren, outerHeight, outerWidth, requestFrame } from '../dom';
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import { cancelFrame, directLiChildren, outerHeight, outerWidth, requestFrame } from '../dom.js';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 
 const SWING = (progress: number): number => 0.5 - Math.cos(progress * Math.PI) / 2;
 
@@ -13,6 +13,13 @@ export class VerticalHorizontalEngine implements TickerEngine {
   private rafID: number | null = null;
   private stepCount = 0;
   private completedCycles = 0;
+  private animEl: HTMLElement | null = null;
+  private animFrom = 0;
+  private animRest = 0;
+  private animDuration = 0;
+  private animElapsed = 0;
+  private animStartTs: number | null = null;
+  private animLastProgress = 0;
 
   constructor(host: TickerHost) {
     this.host = host;
@@ -40,9 +47,24 @@ export class VerticalHorizontalEngine implements TickerEngine {
     this.navigate('next');
   }
 
-  pause(): void {}
+  pause(): void {
+    if (this.rafID !== null) {
+      cancelFrame(this.rafID);
+      this.rafID = null;
+      this.animElapsed = this.animLastProgress * this.animDuration;
+    }
+    this.clearInterval();
+  }
 
   resume(): void {
+    if (this.rafID !== null) {
+      return;
+    }
+    if (this.animEl !== null && this.animElapsed < this.animDuration) {
+      this.animStartTs = null;
+      this.rafID = requestFrame(this.frame);
+      return;
+    }
     if (this.intervalID === null) {
       this.arm();
     }
@@ -54,6 +76,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.clearAnimState();
     for (const li of directLiChildren(this.host.element)) {
       li.style.display = '';
       li.style.opacity = '';
@@ -61,6 +84,8 @@ export class VerticalHorizontalEngine implements TickerEngine {
       li.style.marginTop = '';
       li.style.left = '';
       li.style.right = '';
+      li.style.whiteSpace = '';
+      li.style.maxWidth = '';
     }
   }
 
@@ -105,6 +130,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.clearAnimState();
     this.stepCount = 0;
     this.rotate(mode);
     this.settle();
@@ -137,6 +163,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
       li.style.marginTop = '';
       li.style.left = '';
       li.style.right = '';
+      this.applySingleLine(li);
     }
     const first = directLiChildren(ul)[0];
     if (first) {
@@ -145,6 +172,16 @@ export class VerticalHorizontalEngine implements TickerEngine {
       first.style.display = 'block';
       first.style[styleProp] = '0px';
     }
+  }
+
+  private applySingleLine(li: HTMLElement): void {
+    if (!this.horizontal) {
+      li.style.whiteSpace = '';
+      li.style.maxWidth = '';
+      return;
+    }
+    li.style.whiteSpace = 'nowrap';
+    li.style.maxWidth = 'none';
   }
 
   private styleProp(): StyleProp {
@@ -161,13 +198,24 @@ export class VerticalHorizontalEngine implements TickerEngine {
     return box.clientHeight - (Number.parseFloat(cs.paddingTop) || 0) - (Number.parseFloat(cs.paddingBottom) || 0);
   }
 
+  private visibleWidth(): number {
+    const box = this.host.wrap.parentElement;
+    if (!box) return 0;
+    const cs = getComputedStyle(box);
+    return box.clientWidth - (Number.parseFloat(cs.paddingLeft) || 0) - (Number.parseFloat(cs.paddingRight) || 0);
+  }
+
   private animate(el: HTMLElement): void {
     const styleProp = this.styleProp();
     const negative =
       this.host.options.direction === 'up' || this.host.options.direction === 'right';
     el.style.display = 'block';
     el.style.position = 'absolute';
-    const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
+    const travel = this.horizontal
+      ? negative
+        ? outerWidth(el)
+        : Math.max(outerWidth(el), this.visibleWidth())
+      : Math.max(outerHeight(el), this.visibleHeight());
     const from = negative ? -travel : travel;
     const rest = 0;
 
@@ -177,6 +225,7 @@ export class VerticalHorizontalEngine implements TickerEngine {
       li.style.marginTop = '';
       li.style.left = '';
       li.style.right = '';
+      this.applySingleLine(li);
     }
     el.style.opacity = '1';
     el.style.position = 'absolute';
@@ -190,22 +239,48 @@ export class VerticalHorizontalEngine implements TickerEngine {
       return;
     }
 
-    let startTs: number | null = null;
-    const frame = (ts: number): void => {
-      if (startTs === null) {
-        startTs = ts;
-      }
-      const progress = Math.min(1, (ts - startTs) / duration);
-      if (progress >= 1) {
-        el.style[styleProp] = `${rest}px`;
-        this.rafID = null;
-        this.complete();
-        return;
-      }
-      el.style[styleProp] = `${rest + (from - rest) * (1 - SWING(progress))}px`;
-      this.rafID = requestFrame(frame);
-    };
-    this.rafID = requestFrame(frame);
+    this.animEl = el;
+    this.animFrom = from;
+    this.animRest = rest;
+    this.animDuration = duration;
+    this.animElapsed = 0;
+    this.animLastProgress = 0;
+    this.animStartTs = null;
+    this.rafID = requestFrame(this.frame);
+  }
+
+  private readonly frame = (ts: number): void => {
+    const el = this.animEl;
+    if (el === null) {
+      this.rafID = null;
+      return;
+    }
+    if (this.animStartTs === null) {
+      this.animStartTs = ts;
+    }
+    const total = this.animElapsed + (ts - this.animStartTs);
+    const progress = Math.min(1, total / this.animDuration);
+    if (progress >= 1) {
+      el.style[this.styleProp()] = `${this.animRest}px`;
+      this.rafID = null;
+      this.clearAnimState();
+      this.complete();
+      return;
+    }
+    el.style[this.styleProp()] =
+      `${this.animRest + (this.animFrom - this.animRest) * (1 - SWING(progress))}px`;
+    this.animLastProgress = progress;
+    this.rafID = requestFrame(this.frame);
+  };
+
+  private clearAnimState(): void {
+    this.animEl = null;
+    this.animFrom = 0;
+    this.animRest = 0;
+    this.animDuration = 0;
+    this.animElapsed = 0;
+    this.animStartTs = null;
+    this.animLastProgress = 0;
   }
 
   private complete(): void {

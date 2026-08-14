@@ -1,6 +1,6 @@
-import { directLiChildren } from '../dom';
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import { directLiChildren } from '../dom.js';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 
 export class TypewriterEngine implements TickerEngine {
   private readonly host: TickerHost;
@@ -82,7 +82,7 @@ export class TypewriterEngine implements TickerEngine {
     if (dataText && wrapEl) {
       wrapEl.textContent = dataText;
     }
-    this.allText = typeEl.textContent ?? '';
+    this.allText = (wrapEl ?? typeEl).textContent ?? '';
     for (const li of lis) {
       li.style.opacity = '0';
       li.style.display = 'none';

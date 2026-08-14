@@ -47,6 +47,7 @@ function TickerSection({ title, label, options, pauseOnly = false, headlines = H
       ? { toggle: toggleRef.current }
       : { prev: prevRef.current, next: nextRef.current, toggle: toggleRef.current };
     const ticker = new AcmeTicker(listEl, { ...options, controls });
+    toggleRef.current?.classList.toggle('is-paused', ticker.paused);
 
     const onToggle = (e: Event): void => {
       const detail = (e as CustomEvent).detail as { ticker: HTMLElement; paused: boolean };
@@ -78,11 +79,11 @@ function TickerSection({ title, label, options, pauseOnly = false, headlines = H
         </div>
         <div className={`at-ticker-controls at-ticker-controls-${options.type} at-pos at-flx at-h`}>
           {!pauseOnly && (
-            <button ref={prevRef} className="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
-          )}
-          <button ref={toggleRef} className="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
+            <button ref={prevRef} aria-label="Previous" className="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
+            )}
+          <button ref={toggleRef} aria-label="Toggle playback" className="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
           {!pauseOnly && (
-            <button ref={nextRef} className="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
+            <button ref={nextRef} aria-label="Next" className="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" />
           )}
         </div>
       </div>

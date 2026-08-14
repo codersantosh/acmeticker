@@ -1,7 +1,7 @@
-import type { AcmeTickerOptions, TickerHost } from '../types';
-import { MarqueeEngine } from './marquee';
-import { TypewriterEngine } from './typewriter';
-import { VerticalHorizontalEngine } from './vertical-horizontal';
+import type { AcmeTickerOptions, TickerHost } from '../types.js';
+import { MarqueeEngine } from './marquee.js';
+import { TypewriterEngine } from './typewriter.js';
+import { VerticalHorizontalEngine } from './vertical-horizontal.js';
 
 export interface TickerEngine {
   init(): void;

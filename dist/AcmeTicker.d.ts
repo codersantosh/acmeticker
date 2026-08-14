@@ -1,4 +1,4 @@
-import { type AcmeTickerOptions, type TickerHost } from './types';
+import { type AcmeTickerOptions, type TickerHost } from './types.js';
 export declare class AcmeTicker implements TickerHost {
     readonly element: HTMLElement;
     readonly wrap: HTMLElement;
@@ -6,6 +6,9 @@ export declare class AcmeTicker implements TickerHost {
     paused: boolean;
     rtl: boolean;
     private explicitPaused;
+    private isDestroyed;
+    private isHoverPaused;
+    private isFocusPaused;
     private engine;
     private controls;
     private unbindControls;
@@ -25,5 +28,5 @@ export declare class AcmeTicker implements TickerHost {
     private handlePrev;
     private handleNext;
     private handleToggle;
-    private applyInteractionPause;
+    private updateInteractionPause;
 }

@@ -22,6 +22,7 @@
   --at-p: 10px 0 0;
   --at-ovf: hidden;
   --at-box-szg: border-box;
+  padding-right: 125px;
 }
 
 .at-ticker-box ul {
@@ -29,6 +30,7 @@
   padding: 0;
   list-style-type: none;
   width: 100%;
+  white-space: nowrap;
 }
 
 .at-ticker-controls {
@@ -55,13 +57,47 @@
   --at-bg-cl: #eee;
 }
 
+[dir='rtl'] .at-ticker-box,
+.at-ticker[dir='rtl'] .at-ticker-box {
+  padding-right: 0;
+  padding-left: 125px;
+}
+
+.at-ticker:has([dir='rtl']) .at-ticker-box {
+  padding-right: 0;
+  padding-left: 125px;
+}
+
+.at-ticker-box:dir(rtl) {
+  padding-right: 0;
+  padding-left: 125px;
+}
+
 [dir='rtl'] .at-ticker-controls,
+.at-ticker[dir='rtl'] .at-ticker-controls {
+  --at-r: auto;
+  --at-l: 0;
+}
+
+.at-ticker:has([dir='rtl']) .at-ticker-controls {
+  --at-r: auto;
+  --at-l: 0;
+}
+
 .at-ticker-controls:dir(rtl) {
   --at-r: auto;
   --at-l: 0;
 }
 
 [dir='rtl'] .at-ticker-controls button,
+.at-ticker[dir='rtl'] .at-ticker-controls button {
+  --at-bdr-w: 0 1px 0 0;
+}
+
+.at-ticker:has([dir='rtl']) .at-ticker-controls button {
+  --at-bdr-w: 0 1px 0 0;
+}
+
 .at-ticker-controls button:dir(rtl) {
   --at-bdr-w: 0 1px 0 0;
 }
@@ -107,11 +143,27 @@
 }
 
 [dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-prev:after,
+.at-ticker[dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-prev:after {
+  transform: translate(-50%, -50%) rotate(315deg);
+}
+
+.at-ticker:has([dir='rtl']) .at-ticker-controls-horizontal button.at-ticker-prev:after {
+  transform: translate(-50%, -50%) rotate(315deg);
+}
+
 .at-ticker-controls-horizontal button.at-ticker-prev:dir(rtl):after {
   transform: translate(-50%, -50%) rotate(315deg);
 }
 
 [dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-next:after,
+.at-ticker[dir='rtl'] .at-ticker-controls-horizontal button.at-ticker-next:after {
+  transform: translate(-50%, -50%) rotate(135deg);
+}
+
+.at-ticker:has([dir='rtl']) .at-ticker-controls-horizontal button.at-ticker-next:after {
+  transform: translate(-50%, -50%) rotate(135deg);
+}
+
 .at-ticker-controls-horizontal button.at-ticker-next:dir(rtl):after {
   transform: translate(-50%, -50%) rotate(135deg);
 }

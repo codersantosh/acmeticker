@@ -1,5 +1,5 @@
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 export declare class VerticalHorizontalEngine implements TickerEngine {
     private readonly host;
     private readonly horizontal;
@@ -7,6 +7,13 @@ export declare class VerticalHorizontalEngine implements TickerEngine {
     private rafID;
     private stepCount;
     private completedCycles;
+    private animEl;
+    private animFrom;
+    private animRest;
+    private animDuration;
+    private animElapsed;
+    private animStartTs;
+    private animLastProgress;
     constructor(host: TickerHost);
     init(): void;
     prev(): void;
@@ -20,8 +27,12 @@ export declare class VerticalHorizontalEngine implements TickerEngine {
     private navigate;
     private rotate;
     private settle;
+    private applySingleLine;
     private styleProp;
     private visibleHeight;
+    private visibleWidth;
     private animate;
+    private readonly frame;
+    private clearAnimState;
     private complete;
 }

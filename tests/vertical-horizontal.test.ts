@@ -215,22 +215,31 @@ describe('vertical/horizontal engine', () => {
     expect(order(ul)).toEqual(['item 1', 'item 2', 'item 0']);
   });
 
-  it('pause during an animation lets it finish, then stops', () => {
+  it('pause mid-animation freezes the slide and resume continues from it', () => {
     const { ticker, ul } = mount({ type: 'vertical', direction: 'up' });
 
     vi.advanceTimersByTime(1000);
     raf.step(0);
     raf.step(300);
+    const first = ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
+    const mid = parseFloat(first.style.marginTop);
+    expect(mid).toBeLessThan(0);
+
     ticker.pause();
     raf.step(300);
+    expect(parseFloat(first.style.marginTop)).toBe(mid);
     expect(raf.pendingFrames()).toBe(0);
 
-    const first = ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
+    ticker.play();
+    raf.step(0);
+    expect(parseFloat(first.style.marginTop)).toBe(mid);
+    raf.step(150);
+    const resumed = parseFloat(first.style.marginTop);
+    expect(resumed).toBeGreaterThan(mid);
+    expect(resumed).toBeLessThan(0);
+    raf.step(200);
     expect(first.style.marginTop).toBe('0px');
-
-    const afterPause = order(ul);
-    vi.advanceTimersByTime(10000);
-    expect(order(ul)).toEqual(afterPause);
+    expect(raf.pendingFrames()).toBe(0);
   });
 
   it('resume re-arms autoplay after a pause stopped the interval', () => {
@@ -272,6 +281,45 @@ describe('vertical/horizontal engine', () => {
     expect(raf.pendingFrames()).toBe(0);
     vi.advanceTimersByTime(10000);
     expect(order(ul)).toEqual(['item 1', 'item 2', 'item 0']);
+  });
+
+  it('horizontal items are forced to a single line and restored on destroy', () => {
+    const { ticker, ul } = mount({ type: 'horizontal' });
+
+    for (const li of Array.from(ul.querySelectorAll<HTMLElement>(':scope > li'))) {
+      expect(li.style.whiteSpace).toBe('nowrap');
+      expect(li.style.maxWidth).toBe('none');
+    }
+
+    ticker.destroy();
+    for (const li of Array.from(ul.querySelectorAll<HTMLElement>(':scope > li'))) {
+      expect(li.style.whiteSpace).toBe('');
+      expect(li.style.maxWidth).toBe('');
+    }
+  });
+
+  it('vertical items are not forced to a single line', () => {
+    const { ul } = mount({ type: 'vertical' });
+    for (const li of Array.from(ul.querySelectorAll<HTMLElement>(':scope > li'))) {
+      expect(li.style.whiteSpace).toBe('');
+    }
+  });
+
+  it('inward entry starts at the visible box edge, not mid-box', () => {
+    Object.defineProperty(document.body, 'clientWidth', { configurable: true, value: 500 });
+    try {
+      const { ul } = mount({ type: 'horizontal', direction: 'left' });
+
+      vi.advanceTimersByTime(1000);
+      raf.step(0);
+      const first = ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
+      expect(first.style.left).toBe('500px');
+
+      raf.step(600);
+      expect(first.style.left).toBe('0px');
+    } finally {
+      delete (document.body as { clientWidth?: number }).clientWidth;
+    }
   });
 
   it('degrades gracefully with 0 or 1 items', () => {

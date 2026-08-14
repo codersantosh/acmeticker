@@ -162,6 +162,49 @@ describe('marquee rtl mirroring', () => {
     expect(rtlTxs[2]! < rtlTxs[1]! && rtlTxs[1]! < rtlTxs[0]!).toBe(true);
   });
 
+  it('default direction (no direction option) scrolls rightward in rtl (F-04)', () => {
+    document.body.innerHTML = `<ul id="t" dir="rtl">${LI_WIDTHS.map((_, i) => `<li>item ${i}</li>`).join('')}</ul>`;
+    const ul = document.getElementById('t') as HTMLElement;
+    Array.from(ul.querySelectorAll(':scope > li')).forEach((li, i) => {
+      mockSize(li as HTMLElement, LI_WIDTHS[i] ?? 40, 30);
+    });
+    const ticker = new AcmeTicker(ul, { type: 'marquee', speed: SPEED });
+    mockSize(ticker.wrap, WRAP_WIDTH, 45);
+    ticker.update({ type: 'marquee' });
+
+    const txs: Array<number> = [];
+    raf.step(0);
+    txs.push(translateX(ul));
+    raf.step(100);
+    txs.push(translateX(ul));
+    raf.step(100);
+    txs.push(translateX(ul));
+
+    expect(txs[1]! > txs[0]!).toBe(true);
+    expect(txs[2]! > txs[1]!).toBe(true);
+    ticker.destroy();
+  });
+
+  it('default direction still scrolls leftward in ltr (F-04)', () => {
+    document.body.innerHTML = `<ul id="t">${LI_WIDTHS.map((_, i) => `<li>item ${i}</li>`).join('')}</ul>`;
+    const ul = document.getElementById('t') as HTMLElement;
+    Array.from(ul.querySelectorAll(':scope > li')).forEach((li, i) => {
+      mockSize(li as HTMLElement, LI_WIDTHS[i] ?? 40, 30);
+    });
+    const ticker = new AcmeTicker(ul, { type: 'marquee', speed: SPEED });
+    mockSize(ticker.wrap, WRAP_WIDTH, 45);
+    ticker.update({ type: 'marquee' });
+
+    raf.step(0);
+    raf.step(100);
+    const t1 = translateX(ul);
+    raf.step(100);
+    const t2 = translateX(ul);
+
+    expect(t2).toBeLessThan(t1);
+    ticker.destroy();
+  });
+
   it('rtl: false override keeps ltr motion on an rtl element', () => {
     const plain = mount('marquee', { direction: 'left' });
     animateOne(plain.ticker, raf.step, vi.advanceTimersByTime);

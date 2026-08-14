@@ -1,5 +1,5 @@
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 export declare class TypewriterEngine implements TickerEngine {
     private readonly host;
     private intervalID;

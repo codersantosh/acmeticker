@@ -4,10 +4,10 @@ import {
   resolveControls,
   type ControlCallbacks,
   type ResolvedControls,
-} from './controls';
-import { createWrap, directLiChildren, hideAllButFirst, prefersReducedMotion, resolveRTL, unwrap } from './dom';
-import { createEngine, type TickerEngine } from './engines';
-import { DEFAULTS, type AcmeTickerOptions, type TickerHost } from './types';
+} from './controls.js';
+import { createWrap, directLiChildren, hideAllButFirst, prefersReducedMotion, resolveRTL, unwrap } from './dom.js';
+import { createEngine, type TickerEngine } from './engines/index.js';
+import { DEFAULTS, type AcmeTickerOptions, type TickerHost } from './types.js';
 
 const instances = new WeakMap<HTMLElement, AcmeTicker>();
 
@@ -19,6 +19,9 @@ export class AcmeTicker implements TickerHost {
   rtl: boolean;
 
   private explicitPaused = false;
+  private isDestroyed = false;
+  private isHoverPaused = false;
+  private isFocusPaused = false;
   private engine: TickerEngine;
   private controls: ResolvedControls;
   private unbindControls: () => void;
@@ -102,13 +105,19 @@ export class AcmeTicker implements TickerHost {
   }
 
   destroy(): void {
+    if (this.isDestroyed) {
+      return;
+    }
+    this.isDestroyed = true;
     this.engine.destroy();
     this.unbindControls();
     this.unbindHoverFocus();
     for (const li of directLiChildren(this.element)) {
       li.style.display = '';
     }
-    instances.delete(this.element);
+    if (instances.get(this.element) === this) {
+      instances.delete(this.element);
+    }
     unwrap(this.element, this.wrap);
   }
 
@@ -140,10 +149,10 @@ export class AcmeTicker implements TickerHost {
 
   private bindInteractionHandlers(): () => void {
     return bindHoverFocus(this.element, this.options, {
-      onHoverEnter: () => this.applyInteractionPause(true),
-      onHoverLeave: () => this.applyInteractionPause(false),
-      onFocusIn: () => this.applyInteractionPause(true),
-      onFocusOut: () => this.applyInteractionPause(false),
+      onHoverEnter: () => this.updateInteractionPause(true, this.isFocusPaused),
+      onHoverLeave: () => this.updateInteractionPause(false, this.isFocusPaused),
+      onFocusIn: () => this.updateInteractionPause(this.isHoverPaused, true),
+      onFocusOut: () => this.updateInteractionPause(this.isHoverPaused, false),
     });
   }
 
@@ -164,9 +173,11 @@ export class AcmeTicker implements TickerHost {
     this.toggle();
   }
 
-  private applyInteractionPause(paused: boolean): void {
+  private updateInteractionPause(hover: boolean, focus: boolean): void {
+    this.isHoverPaused = hover;
+    this.isFocusPaused = focus;
     if (this.options.type === 'marquee') {
-      if (paused) {
+      if (hover || focus) {
         this.engine.pause();
       } else {
         this.engine.resume();
@@ -174,6 +185,10 @@ export class AcmeTicker implements TickerHost {
       return;
     }
     if (this.explicitPaused) {
+      return;
+    }
+    const paused = hover || focus;
+    if (this.paused === paused) {
       return;
     }
     this.paused = paused;

@@ -42,6 +42,23 @@ All notable changes to AcmeTicker are documented here. The format follows [Keep 
 - Empty or single-item tickers degrade gracefully instead of throwing.
 - `speed <= 0` or empty lists no longer spin a degenerate infinite animation loop in marquee mode.
 - Explicitly paused (or reduced-motion-started) vertical/horizontal/typewriter tickers no longer resume when the pointer or focus leaves the ticker. Interaction pause and explicit pause are now tracked separately; marquee intentionally retains the v1 resume-on-leave behavior.
+- **`pause()` mid-slide now freezes the current position**; `resume()` continues from the frozen point instead of letting the slide finish first. This matches the documented "current item/position is preserved" contract.
+- **Horizontal items are forced onto a single line** (`white-space: nowrap`), so long headlines can never wrap to two lines mid-slide on narrow viewports (restored on `destroy()`).
+- **Inward entries (`direction: 'left'`/`'down'`) start at the box's far edge** rather than mid-box when the item is narrower than the visible area.
+- **Marquee duplicates short content until the viewport is fully covered**, and re-measures the wrapper on viewport resize (ResizeObserver with a `window.resize` fallback) without resetting the loop position.
+- **The default marquee direction scrolls with the RTL reading flow** when no `direction` is set on an RTL page (the default `'up'` previously fell through to leftward motion).
+- **`destroy()` on a superseded instance can no longer corrupt the active instance's WeakMap entry**, which previously allowed a third mount to nest a second wrapper and leave stale timers running.
+- **Typewriter teardown restores nested item markup exactly** - typing source is the first child element only, so sibling text (e.g. `<span>` badges) is no longer duplicated into the anchor on restore.
+- **Hover and focus pauses are tracked independently** - `mouseleave` while focus remains inside (or `focusout` while hovering) no longer unpauses the ticker prematurely.
+- **Type declarations use explicit `.js` import extensions** and are emitted under `NodeNext` module resolution, fixing `TS2834` for consumers.
+- **The minified CommonJS bundle is now `dist/acmeticker.min.cjs`**, so it loads as CJS inside `"type": "module"` packages (the previous `.cjs.min.js` suffix was treated as ESM by Node).
+
+### Examples and demo fixes
+
+- Control buttons now carry accessible names (`aria-label`) on every demo page and in the React examples.
+- The play/pause glyph syncs with the initial paused state on load (visible under `prefers-reduced-motion`).
+- The example stylesheet reserves space for the controls so ticker text never slides beneath them, mirrors controls when `dir="rtl"` is on the ticker, the `<ul>`, or any ancestor, and splits `:dir()` selectors into separate rules for older browsers.
+- Demo pages ship an inline SVG favicon (no more 404 for `/favicon.ico`).
 
 ## [1.0.0] - 2019
 

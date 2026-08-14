@@ -1,5 +1,5 @@
-export { AcmeTicker } from './AcmeTicker';
-export { DEFAULTS } from './types';
+export { AcmeTicker } from './AcmeTicker.js';
+export { DEFAULTS } from './types.js';
 export type {
   AcmeTickerControls,
   AcmeTickerOptions,
@@ -8,4 +8,4 @@ export type {
   TickerDirection,
   TickerHost,
   TickerType,
-} from './types';
+} from './types.js';

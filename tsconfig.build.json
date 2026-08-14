@@ -5,6 +5,8 @@
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
     "rootDir": "src"
   },

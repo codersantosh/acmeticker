@@ -1,4 +1,4 @@
-import type { AcmeTickerOptions, TickerHost } from '../types';
+import type { AcmeTickerOptions, TickerHost } from '../types.js';
 export interface TickerEngine {
     init(): void;
     prev(): void;

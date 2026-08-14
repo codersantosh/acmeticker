@@ -1,5 +1,5 @@
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 export declare class MarqueeEngine implements TickerEngine {
     private readonly host;
     private readonly directionRight;
@@ -14,6 +14,8 @@ export declare class MarqueeEngine implements TickerEngine {
     private legDuration;
     private startTs;
     private completedCycles;
+    private resizeObserver;
+    private unbindResize;
     constructor(host: TickerHost);
     init(): void;
     prev(): void;
@@ -25,4 +27,8 @@ export declare class MarqueeEngine implements TickerEngine {
     private readonly frame;
     private legComplete;
     private applyTransform;
+    private attachResizeTracking;
+    private detachResizeTracking;
+    private readonly handleResize;
+    private remeasure;
 }

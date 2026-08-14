@@ -36,7 +36,7 @@ new AcmeTicker(document.querySelector('.my-news-ticker'), {
 ### Plain script tag (no bundler)
 
 ```html
-<script src="acmeticker.min.js"></script>
+<script src="dist/acmeticker.min.js"></script>
 <script>
   new AcmeTicker(document.querySelector('.my-news-ticker'), { type: 'horizontal', direction: 'right' });
 </script>

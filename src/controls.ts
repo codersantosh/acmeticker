@@ -1,4 +1,4 @@
-import type { AcmeTickerOptions, ControlTarget } from './types';
+import type { AcmeTickerOptions, ControlTarget } from './types.js';
 
 export interface ResolvedControls {
   prev: Array<HTMLElement>;

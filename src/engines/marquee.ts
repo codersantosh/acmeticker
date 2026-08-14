@@ -1,6 +1,6 @@
-import { cancelFrame, directLiChildren, outerWidth, requestFrame } from '../dom';
-import type { TickerHost } from '../types';
-import type { TickerEngine } from './index';
+import { cancelFrame, directLiChildren, outerWidth, requestFrame } from '../dom.js';
+import type { TickerHost } from '../types.js';
+import type { TickerEngine } from './index.js';
 
 const LEGACY_WIDTH_FUDGE = 5;
 
@@ -18,12 +18,15 @@ export class MarqueeEngine implements TickerEngine {
   private legDuration = 0;
   private startTs: number | null = null;
   private completedCycles = 0;
+  private resizeObserver: ResizeObserver | null = null;
+  private unbindResize: (() => void) | null = null;
 
   constructor(host: TickerHost) {
     this.host = host;
+    const rawDirection = host.options.direction;
     this.directionRight = host.rtl
-      ? host.options.direction === 'left'
-      : host.options.direction === 'right';
+      ? rawDirection !== 'right'
+      : rawDirection === 'right';
     this.speed = host.options.speed;
   }
 
@@ -47,12 +50,21 @@ export class MarqueeEngine implements TickerEngine {
     }
     this.listWidth = listWidth;
     this.originalCount = originals.length;
-    for (const li of originals) {
-      ul.appendChild(li.cloneNode(true) as HTMLElement);
+    if (listWidth > 0) {
+      let totalWidth = listWidth;
+      while (totalWidth < this.wrapWidth + listWidth || totalWidth < listWidth * 2) {
+        for (const li of originals) {
+          ul.appendChild(li.cloneNode(true) as HTMLElement);
+        }
+        totalWidth += listWidth;
+      }
+      ul.style.width = `${totalWidth}px`;
+    } else {
+      ul.style.width = `${listWidth * 2}px`;
     }
-    ul.style.width = `${listWidth * 2}px`;
 
     this.position = 0;
+    this.attachResizeTracking();
     if (listWidth <= 0 || !(this.speed > 0)) {
       return;
     }
@@ -89,6 +101,7 @@ export class MarqueeEngine implements TickerEngine {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.detachResizeTracking();
     const ul = this.host.element;
     const lis = directLiChildren(ul);
     while (lis.length > this.originalCount) {
@@ -150,5 +163,36 @@ export class MarqueeEngine implements TickerEngine {
       ? this.wrapWidth - this.listWidth * 2 - this.position
       : this.position;
     this.host.element.style.transform = `translateX(${x - offset}px)`;
+  }
+
+  private attachResizeTracking(): void {
+    this.detachResizeTracking();
+    if (typeof ResizeObserver === 'function') {
+      this.resizeObserver = new ResizeObserver(() => this.remeasure());
+      this.resizeObserver.observe(this.host.wrap);
+    } else if (typeof window !== 'undefined') {
+      window.addEventListener('resize', this.handleResize);
+      this.unbindResize = () => window.removeEventListener('resize', this.handleResize);
+    }
+  }
+
+  private detachResizeTracking(): void {
+    if (this.resizeObserver !== null) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this.unbindResize !== null) {
+      this.unbindResize();
+      this.unbindResize = null;
+    }
+  }
+
+  private readonly handleResize = (): void => {
+    this.remeasure();
+  };
+
+  private remeasure(): void {
+    this.wrapWidth = outerWidth(this.host.wrap);
+    this.applyTransform();
   }
 }

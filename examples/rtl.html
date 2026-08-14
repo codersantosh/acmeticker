@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231974d2%22/><rect x=%226%22 y=%2210%22 width=%2220%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2217%22 width=%2214%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2224%22 width=%2218%22 height=%223%22 fill=%22white%22/></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>AcmeTicker - RTL Demo</title>
@@ -35,9 +36,9 @@
             </ul>
         </div>
         <div class="at-ticker-controls at-ticker-controls-vertical at-pos at-flx at-h">
-            <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
 
@@ -57,9 +58,9 @@
             </ul>
         </div>
         <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
-            <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
 
@@ -79,7 +80,7 @@
             </ul>
         </div>
         <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
-            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
 
@@ -99,9 +100,9 @@
             </ul>
         </div>
         <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
-            <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
 
@@ -121,9 +122,9 @@
             </ul>
         </div>
         <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
-            <button class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
-            <button class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+            <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
         </div>
     </div>
 </div>
@@ -151,7 +152,8 @@
             delete controls.prev;
             delete controls.next;
         }
-        new AcmeTicker(el, { ...options, controls });
+        const ticker = new AcmeTicker(el, { ...options, controls });
+        el.closest('.at-ticker')?.querySelector('.at-ticker-pause')?.classList.toggle('is-paused', ticker.paused);
     }
 </script>
 <script>

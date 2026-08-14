@@ -162,6 +162,37 @@ describe('multi-instance independence', () => {
     expect(a.paused).toBe(false);
   });
 
+  it('focus pause survives mouseleave while focus remains inside (F-10)', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+    expect(a.paused).toBe(false);
+
+    aEl.dispatchEvent(new FocusEvent('focusin'));
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new FocusEvent('focusout'));
+    expect(a.paused).toBe(false);
+  });
+
+  it('hover pause survives focusout while the pointer remains inside (F-10)', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+    const a = makeTicker(aEl, { type: 'vertical' });
+
+    aEl.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new FocusEvent('focusout'));
+    expect(a.paused).toBe(true);
+
+    aEl.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(a.paused).toBe(false);
+  });
+
   it('emits the toggle event with the default paused state via public toggle()', () => {
     document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
     const aEl = document.getElementById('a') as HTMLElement;
@@ -185,6 +216,21 @@ describe('multi-instance independence', () => {
 });
 
 describe('destroy isolation', () => {
+  it('stale destroy of a superseded instance leaves the active one intact (F-06)', () => {
+    document.body.innerHTML = '<ul id="a"><li>1</li><li>2</li></ul>';
+    const aEl = document.getElementById('a') as HTMLElement;
+
+    const t1 = makeTicker(aEl, { type: 'vertical' });
+    makeTicker(aEl, { type: 'vertical' }); // constructor destroys t1
+    t1.destroy(); // stale — must not clear the WeakMap entry for the active instance
+
+    makeTicker(aEl, { type: 'vertical' }); // must destroy the active instance, not stack a wrap
+    expect(document.querySelectorAll('.acmeticker-wrap')).toHaveLength(1);
+
+    t1.destroy(); // idempotent
+    expect(document.querySelectorAll('.acmeticker-wrap')).toHaveLength(1);
+  });
+
   it('unwraps, unbinds controls, and leaves other instances untouched', () => {
     document.body.innerHTML = `
       <ul id="a"><li>1</li><li>2</li></ul>

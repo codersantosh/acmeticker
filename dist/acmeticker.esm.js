@@ -153,6 +153,8 @@ var MarqueeEngine = class {
     this.legDuration = 0;
     this.startTs = null;
     this.completedCycles = 0;
+    this.resizeObserver = null;
+    this.unbindResize = null;
     this.frame = (ts) => {
       if (this.startTs === null) {
         this.startTs = ts;
@@ -168,8 +170,12 @@ var MarqueeEngine = class {
       }
       this.rafID = requestFrame(this.frame);
     };
+    this.handleResize = () => {
+      this.remeasure();
+    };
     this.host = host;
-    this.directionRight = host.rtl ? host.options.direction === "left" : host.options.direction === "right";
+    const rawDirection = host.options.direction;
+    this.directionRight = host.rtl ? rawDirection !== "right" : rawDirection === "right";
     this.speed = host.options.speed;
   }
   init() {
@@ -192,11 +198,20 @@ var MarqueeEngine = class {
     }
     this.listWidth = listWidth;
     this.originalCount = originals.length;
-    for (const li of originals) {
-      ul.appendChild(li.cloneNode(true));
+    if (listWidth > 0) {
+      let totalWidth = listWidth;
+      while (totalWidth < this.wrapWidth + listWidth || totalWidth < listWidth * 2) {
+        for (const li of originals) {
+          ul.appendChild(li.cloneNode(true));
+        }
+        totalWidth += listWidth;
+      }
+      ul.style.width = `${totalWidth}px`;
+    } else {
+      ul.style.width = `${listWidth * 2}px`;
     }
-    ul.style.width = `${listWidth * 2}px`;
     this.position = 0;
+    this.attachResizeTracking();
     if (listWidth <= 0 || !(this.speed > 0)) {
       return;
     }
@@ -230,6 +245,7 @@ var MarqueeEngine = class {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.detachResizeTracking();
     const ul = this.host.element;
     const lis = directLiChildren(ul);
     while (lis.length > this.originalCount) {
@@ -270,6 +286,30 @@ var MarqueeEngine = class {
     const offset = this.host.rtl ? this.wrapWidth - this.listWidth * 2 : 0;
     const x = this.directionRight ? this.wrapWidth - this.listWidth * 2 - this.position : this.position;
     this.host.element.style.transform = `translateX(${x - offset}px)`;
+  }
+  attachResizeTracking() {
+    this.detachResizeTracking();
+    if (typeof ResizeObserver === "function") {
+      this.resizeObserver = new ResizeObserver(() => this.remeasure());
+      this.resizeObserver.observe(this.host.wrap);
+    } else if (typeof window !== "undefined") {
+      window.addEventListener("resize", this.handleResize);
+      this.unbindResize = () => window.removeEventListener("resize", this.handleResize);
+    }
+  }
+  detachResizeTracking() {
+    if (this.resizeObserver !== null) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this.unbindResize !== null) {
+      this.unbindResize();
+      this.unbindResize = null;
+    }
+  }
+  remeasure() {
+    this.wrapWidth = outerWidth(this.host.wrap);
+    this.applyTransform();
   }
 };
 
@@ -345,7 +385,7 @@ var TypewriterEngine = class {
     if (dataText && wrapEl) {
       wrapEl.textContent = dataText;
     }
-    this.allText = typeEl.textContent ?? "";
+    this.allText = (wrapEl ?? typeEl).textContent ?? "";
     for (const li of lis) {
       li.style.opacity = "0";
       li.style.display = "none";
@@ -446,6 +486,35 @@ var VerticalHorizontalEngine = class {
     this.rafID = null;
     this.stepCount = 0;
     this.completedCycles = 0;
+    this.animEl = null;
+    this.animFrom = 0;
+    this.animRest = 0;
+    this.animDuration = 0;
+    this.animElapsed = 0;
+    this.animStartTs = null;
+    this.animLastProgress = 0;
+    this.frame = (ts) => {
+      const el = this.animEl;
+      if (el === null) {
+        this.rafID = null;
+        return;
+      }
+      if (this.animStartTs === null) {
+        this.animStartTs = ts;
+      }
+      const total = this.animElapsed + (ts - this.animStartTs);
+      const progress = Math.min(1, total / this.animDuration);
+      if (progress >= 1) {
+        el.style[this.styleProp()] = `${this.animRest}px`;
+        this.rafID = null;
+        this.clearAnimState();
+        this.complete();
+        return;
+      }
+      el.style[this.styleProp()] = `${this.animRest + (this.animFrom - this.animRest) * (1 - SWING(progress))}px`;
+      this.animLastProgress = progress;
+      this.rafID = requestFrame(this.frame);
+    };
     this.host = host;
     this.horizontal = host.options.type === "horizontal";
   }
@@ -468,8 +537,22 @@ var VerticalHorizontalEngine = class {
     this.navigate("next");
   }
   pause() {
+    if (this.rafID !== null) {
+      cancelFrame(this.rafID);
+      this.rafID = null;
+      this.animElapsed = this.animLastProgress * this.animDuration;
+    }
+    this.clearInterval();
   }
   resume() {
+    if (this.rafID !== null) {
+      return;
+    }
+    if (this.animEl !== null && this.animElapsed < this.animDuration) {
+      this.animStartTs = null;
+      this.rafID = requestFrame(this.frame);
+      return;
+    }
     if (this.intervalID === null) {
       this.arm();
     }
@@ -480,6 +563,7 @@ var VerticalHorizontalEngine = class {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.clearAnimState();
     for (const li of directLiChildren(this.host.element)) {
       li.style.display = "";
       li.style.opacity = "";
@@ -487,6 +571,8 @@ var VerticalHorizontalEngine = class {
       li.style.marginTop = "";
       li.style.left = "";
       li.style.right = "";
+      li.style.whiteSpace = "";
+      li.style.maxWidth = "";
     }
   }
   arm() {
@@ -527,6 +613,7 @@ var VerticalHorizontalEngine = class {
       cancelFrame(this.rafID);
       this.rafID = null;
     }
+    this.clearAnimState();
     this.stepCount = 0;
     this.rotate(mode);
     this.settle();
@@ -557,6 +644,7 @@ var VerticalHorizontalEngine = class {
       li.style.marginTop = "";
       li.style.left = "";
       li.style.right = "";
+      this.applySingleLine(li);
     }
     const first = directLiChildren(ul)[0];
     if (first) {
@@ -565,6 +653,15 @@ var VerticalHorizontalEngine = class {
       first.style.display = "block";
       first.style[styleProp] = "0px";
     }
+  }
+  applySingleLine(li) {
+    if (!this.horizontal) {
+      li.style.whiteSpace = "";
+      li.style.maxWidth = "";
+      return;
+    }
+    li.style.whiteSpace = "nowrap";
+    li.style.maxWidth = "none";
   }
   styleProp() {
     if (this.horizontal) {
@@ -578,12 +675,18 @@ var VerticalHorizontalEngine = class {
     const cs = getComputedStyle(box);
     return box.clientHeight - (Number.parseFloat(cs.paddingTop) || 0) - (Number.parseFloat(cs.paddingBottom) || 0);
   }
+  visibleWidth() {
+    const box = this.host.wrap.parentElement;
+    if (!box) return 0;
+    const cs = getComputedStyle(box);
+    return box.clientWidth - (Number.parseFloat(cs.paddingLeft) || 0) - (Number.parseFloat(cs.paddingRight) || 0);
+  }
   animate(el) {
     const styleProp = this.styleProp();
     const negative = this.host.options.direction === "up" || this.host.options.direction === "right";
     el.style.display = "block";
     el.style.position = "absolute";
-    const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
+    const travel = this.horizontal ? negative ? outerWidth(el) : Math.max(outerWidth(el), this.visibleWidth()) : Math.max(outerHeight(el), this.visibleHeight());
     const from = negative ? -travel : travel;
     const rest = 0;
     for (const li of directLiChildren(this.host.element)) {
@@ -592,6 +695,7 @@ var VerticalHorizontalEngine = class {
       li.style.marginTop = "";
       li.style.left = "";
       li.style.right = "";
+      this.applySingleLine(li);
     }
     el.style.opacity = "1";
     el.style.position = "absolute";
@@ -603,22 +707,23 @@ var VerticalHorizontalEngine = class {
       this.complete();
       return;
     }
-    let startTs = null;
-    const frame = (ts) => {
-      if (startTs === null) {
-        startTs = ts;
-      }
-      const progress = Math.min(1, (ts - startTs) / duration);
-      if (progress >= 1) {
-        el.style[styleProp] = `${rest}px`;
-        this.rafID = null;
-        this.complete();
-        return;
-      }
-      el.style[styleProp] = `${rest + (from - rest) * (1 - SWING(progress))}px`;
-      this.rafID = requestFrame(frame);
-    };
-    this.rafID = requestFrame(frame);
+    this.animEl = el;
+    this.animFrom = from;
+    this.animRest = rest;
+    this.animDuration = duration;
+    this.animElapsed = 0;
+    this.animLastProgress = 0;
+    this.animStartTs = null;
+    this.rafID = requestFrame(this.frame);
+  }
+  clearAnimState() {
+    this.animEl = null;
+    this.animFrom = 0;
+    this.animRest = 0;
+    this.animDuration = 0;
+    this.animElapsed = 0;
+    this.animStartTs = null;
+    this.animLastProgress = 0;
   }
   complete() {
     const itemCount = directLiChildren(this.host.element).length;
@@ -669,6 +774,9 @@ var instances = /* @__PURE__ */ new WeakMap();
 var AcmeTicker = class {
   constructor(element, options) {
     this.explicitPaused = false;
+    this.isDestroyed = false;
+    this.isHoverPaused = false;
+    this.isFocusPaused = false;
     const existing = instances.get(element);
     if (existing) {
       existing.destroy();
@@ -733,13 +841,19 @@ var AcmeTicker = class {
     this.engine.init();
   }
   destroy() {
+    if (this.isDestroyed) {
+      return;
+    }
+    this.isDestroyed = true;
     this.engine.destroy();
     this.unbindControls();
     this.unbindHoverFocus();
     for (const li of directLiChildren(this.element)) {
       li.style.display = "";
     }
-    instances.delete(this.element);
+    if (instances.get(this.element) === this) {
+      instances.delete(this.element);
+    }
     unwrap(this.element, this.wrap);
   }
   emitToggle(paused) {
@@ -767,10 +881,10 @@ var AcmeTicker = class {
   }
   bindInteractionHandlers() {
     return bindHoverFocus(this.element, this.options, {
-      onHoverEnter: () => this.applyInteractionPause(true),
-      onHoverLeave: () => this.applyInteractionPause(false),
-      onFocusIn: () => this.applyInteractionPause(true),
-      onFocusOut: () => this.applyInteractionPause(false)
+      onHoverEnter: () => this.updateInteractionPause(true, this.isFocusPaused),
+      onHoverLeave: () => this.updateInteractionPause(false, this.isFocusPaused),
+      onFocusIn: () => this.updateInteractionPause(this.isHoverPaused, true),
+      onFocusOut: () => this.updateInteractionPause(this.isHoverPaused, false)
     });
   }
   handlePrev(e) {
@@ -787,9 +901,11 @@ var AcmeTicker = class {
     }
     this.toggle();
   }
-  applyInteractionPause(paused) {
+  updateInteractionPause(hover, focus) {
+    this.isHoverPaused = hover;
+    this.isFocusPaused = focus;
     if (this.options.type === "marquee") {
-      if (paused) {
+      if (hover || focus) {
         this.engine.pause();
       } else {
         this.engine.resume();
@@ -797,6 +913,10 @@ var AcmeTicker = class {
       return;
     }
     if (this.explicitPaused) {
+      return;
+    }
+    const paused = hover || focus;
+    if (this.paused === paused) {
       return;
     }
     this.paused = paused;

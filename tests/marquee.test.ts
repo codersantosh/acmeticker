@@ -207,6 +207,35 @@ describe('marquee engine', () => {
     ticker.play();
     expect(raf.pendingFrames()).toBe(0);
   });
+
+  it('duplicates short content until the viewport is covered (F-05)', () => {
+    const { ticker, ul } = mount({}, [40]);
+
+    const lis = Array.from(ul.querySelectorAll<HTMLElement>(':scope > li'));
+    const listWidth = 40 + 10 + 5;
+    expect(lis.length).toBe(7);
+    expect(ul.style.width).toBe('385px');
+    expect(parseInt(ul.style.width, 10)).toBeGreaterThanOrEqual(WRAP_WIDTH + listWidth);
+
+    ticker.destroy();
+    expect(ul.querySelectorAll(':scope > li')).toHaveLength(1);
+  });
+
+  it('recomputes wrap width on resize without resetting the loop position (F-12)', () => {
+    const { ticker, ul } = mount({ direction: 'right' });
+    const lw = copyWidth(ul);
+
+    raf.step(0);
+    raf.step(100);
+    mockSize(ticker.wrap, 600, 45);
+    window.dispatchEvent(new Event('resize'));
+
+    expect(translateX(ul)).toBeCloseTo(600 - 2 * lw + 50, 6);
+
+    raf.step(100);
+    expect(translateX(ul)).toBeCloseTo(600 - 2 * lw + 100, 6);
+    ticker.destroy();
+  });
 });
 
 describe('marquee seamless loop (issue #18)', () => {
