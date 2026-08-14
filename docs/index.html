@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-at-theme="auto">
 <head>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%231974d2%22/><rect x=%226%22 y=%229%22 width=%2220%22 height=%223.5%22 rx=%221.75%22 fill=%22white%22/><rect x=%226%22 y=%2216.5%22 width=%2213%22 height=%223.5%22 rx=%221.75%22 fill=%22white%22/><rect x=%226%22 y=%2224%22 width=%2217%22 height=%223.5%22 rx=%221.75%22 fill=%22white%22/></svg>">
     <meta charset="UTF-8">
@@ -31,12 +31,14 @@
             --at-fnt-fam: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             --at-scr-beh: smooth;
 
-            /* Visual Theming Tokens */
+            /* Visual Theming Tokens (Light Mode Defaults) */
             --brand-light: #eff6ff;
             --bg: #f8fafc;
             --surface: #ffffff;
+            --surface-subtle: #f8fafc;
             --border: #e2e8f0;
             --border-hover: #cbd5e1;
+            --nav-bg: rgba(255, 255, 255, 0.92);
             --slate-900: #090d16;
             --slate-800: #0f172a;
             --radius-sm: 8px;
@@ -48,6 +50,44 @@
             --shadow-lg: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
             --font: var(--at-fnt-fam);
             --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        /* Explicit Dark Mode Overrides */
+        [data-at-theme="dark"] {
+            --bg: #090d16;
+            --surface: #0f172a;
+            --surface-subtle: #1e293b;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(56, 189, 248, 0.4);
+            --nav-bg: rgba(9, 13, 22, 0.92);
+            --at-base-color: #f1f5f9;
+            --at-body-color: #cbd5e1;
+            --at-quaternary: #94a3b8;
+            --brand-light: rgba(25, 116, 210, 0.18);
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Auto/Default Mode using OS Preference */
+        @media (prefers-color-scheme: dark) {
+            [data-at-theme="auto"] {
+                --bg: #090d16;
+                --surface: #0f172a;
+                --surface-subtle: #1e293b;
+                --border: rgba(255, 255, 255, 0.1);
+                --border-hover: rgba(56, 189, 248, 0.4);
+                --nav-bg: rgba(9, 13, 22, 0.92);
+                --at-base-color: #f1f5f9;
+                --at-body-color: #cbd5e1;
+                --at-quaternary: #94a3b8;
+                --brand-light: rgba(25, 116, 210, 0.18);
+                --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+                --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+                --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+                --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
+            }
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -63,6 +103,7 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         a { color: var(--at-primary); text-decoration: none; transition: color 0.15s ease; }
@@ -121,14 +162,14 @@
 
         .at-btn-outln {
             --at-cl: var(--at-base-color);
-            --at-bg-cl: var(--at-white);
+            --at-bg-cl: var(--surface);
             --at-bdr-cl: var(--border);
             --at-box-sdw: var(--shadow-xs);
             box-shadow: var(--at-box-sdw);
         }
         .at-btn-outln:hover {
             --at-bdr-cl: var(--border-hover);
-            --at-bg-cl: #f8fafc;
+            --at-bg-cl: var(--surface-subtle);
             --at-cl: var(--at-primary);
             color: var(--at-primary);
         }
@@ -152,12 +193,51 @@
             --at-bdr-rad: 7px;
         }
 
+        /* ---------- Theme Switcher Component ---------- */
+        .theme-toggle-group {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: 0;
+            border-radius: 999px;
+            color: var(--at-quaternary);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            font-family: var(--font);
+        }
+
+        .theme-btn:hover {
+            color: var(--at-base-color);
+        }
+
+        .theme-btn.active {
+            background: var(--surface);
+            color: var(--at-primary);
+            box-shadow: var(--shadow-xs);
+            font-weight: 700;
+        }
+
         /* ---------- Navbar ---------- */
         .nav {
-            background: rgba(255, 255, 255, 0.92);
+            background: var(--nav-bg);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .nav-inner { height: 64px; }
@@ -373,7 +453,7 @@
 
         .feature:hover {
             --at-box-sdw: var(--shadow-lg);
-            --at-bdr-cl: #b9d4f3;
+            --at-bdr-cl: var(--border-hover);
             transform: translateY(-3px);
         }
 
@@ -389,7 +469,7 @@
         }
 
         .feature:hover .f-icon {
-            --at-bg-cl: #dbeafe;
+            --at-bg-cl: var(--brand-light);
             transform: scale(1.06);
         }
 
@@ -404,7 +484,7 @@
         }
 
         .stage-workbench-header {
-            --at-bg-cl: #f8fafc;
+            --at-bg-cl: var(--surface-subtle);
             --at-bdr-cl: var(--border);
             --at-bdr-w: 0 0 1px 0;
             --at-bdr-sty: solid;
@@ -440,14 +520,25 @@
         }
 
         #demos .stage-content .at-ticker {
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
             --at-m: 20px 0 0;
             border-radius: 9px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            box-shadow: var(--shadow-xs);
         }
 
         #demos .stage-content .at-ticker:first-child {
             --at-m: 0;
+        }
+
+        #demos .stage-content .at-ticker .my-news-ticker li a {
+            color: var(--at-base-color);
+        }
+
+        #demos .stage-content .at-ticker .at-ticker-controls button {
+            --at-bg-cl: var(--surface-subtle);
+            --at-bdr-cl: var(--border);
         }
 
         /* ---------- RTL Showcase ---------- */
@@ -483,10 +574,21 @@
         }
 
         .rtl-ticker {
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
             --at-m: 0;
             border-radius: 9px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
+        }
+
+        .rtl-ticker .my-news-ticker li a {
+            color: var(--at-base-color);
+        }
+
+        .rtl-ticker .at-ticker-controls button {
+            --at-bg-cl: var(--surface-subtle);
+            --at-bdr-cl: var(--border);
         }
 
         /* ---------- Comparison Table ---------- */
@@ -516,7 +618,7 @@
         }
 
         .compare th {
-            background: #f8fafc;
+            background: var(--surface-subtle);
             font-size: 12.5px;
             font-weight: 700;
             text-transform: uppercase;
@@ -525,7 +627,7 @@
         }
 
         .compare tbody tr:hover {
-            background: #f8fafc;
+            background: var(--surface-subtle);
         }
 
         .compare tr:last-child td { border-bottom: 0; }
@@ -623,7 +725,7 @@
 
         .demo-card:hover {
             --at-box-sdw: var(--shadow-lg);
-            --at-bdr-cl: #93c5fd;
+            --at-bdr-cl: var(--border-hover);
             transform: translateY(-3px);
             text-decoration: none;
         }
@@ -640,7 +742,7 @@
         }
 
         .demo-card:hover .dc-icon {
-            --at-bg-cl: #dbeafe;
+            --at-bg-cl: var(--brand-light);
             transform: scale(1.08);
         }
 
@@ -684,7 +786,7 @@
         }
 
         .api-table-wrap th {
-            background: #f8fafc;
+            background: var(--surface-subtle);
             font-size: 12.5px;
             font-weight: 700;
             text-transform: uppercase;
@@ -692,12 +794,12 @@
             color: var(--at-quaternary);
         }
 
-        .api-table-wrap tbody tr:hover { background: #f8fafc; }
+        .api-table-wrap tbody tr:hover { background: var(--surface-subtle); }
         .api-table-wrap tr:last-child td { border-bottom: 0; }
 
         .api-table-wrap code {
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
+            background: var(--brand-light);
+            border: 1px solid rgba(25, 116, 210, 0.2);
             border-radius: 5px;
             padding: 2px 7px;
             font-family: var(--mono);
@@ -720,8 +822,8 @@
         }
 
         .method-chip:hover {
-            --at-bdr-cl: #93c5fd;
-            --at-bg-cl: #eff6ff;
+            --at-bdr-cl: var(--border-hover);
+            --at-bg-cl: var(--surface-subtle);
             transform: translateY(-1px);
         }
 
@@ -767,16 +869,20 @@
             .section { padding-top: 60px; }
         }
 
-        @media (max-width: 480px) {
-            .nav-brand { font-size: 16px; }
-            .at-btn-sm { --at-p: 5px 9px; --at-fnt-sz: 12px; }
+        @media (max-width: 520px) {
+            .nav-brand { font-size: 15px; gap: 6px; }
+            .at-btn-sm { --at-p: 5px 8px; --at-fnt-sz: 12px; }
             .hero-cta { flex-direction: column !important; align-items: stretch !important; }
             .hero-cta > * { justify-content: center; text-align: center; }
             .rtl-card { padding: 16px !important; }
+            .theme-btn span { display: none; }
+            .theme-btn { padding: 4px 6px; }
         }
 
-        @media (max-width: 360px) {
+        @media (max-width: 380px) {
             .nav-actions a.at-btn-outln { display: none !important; }
+            .nav-brand span { display: none; }
+            .nav-inner { padding-left: 8px !important; padding-right: 8px !important; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -789,12 +895,12 @@
 
 <!-- Sticky Navigation -->
 <nav class="nav at-stky at-pos at-z-idx" style="--at-z-idx: 50; --at-t: 0;">
-    <div class="at-ctnr at-flx at-al-itm-ctr nav-inner" style="--at-gap: 20px;">
+    <div class="at-ctnr at-flx at-al-itm-ctr nav-inner" style="--at-gap: 16px;">
         <a class="nav-brand" href="#top" aria-label="AcmeTicker home">
             <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1974d2"/><rect x="6" y="9" width="20" height="3.5" rx="1.75" fill="white"/><rect x="6" y="16.5" width="13" height="3.5" rx="1.75" fill="white"/><rect x="6" y="24" width="17" height="3.5" rx="1.75" fill="white"/></svg>
-            AcmeTicker
+            <span>AcmeTicker</span>
         </a>
-        <div class="nav-links at-flx at-al-itm-ctr at-gap" style="--at-gap: 6px; margin-left: 20px;">
+        <div class="nav-links at-flx at-al-itm-ctr at-gap" style="--at-gap: 6px; margin-left: 14px;">
             <a href="#features">Features</a>
             <a href="#demos">Live demos</a>
             <a href="#quickstart">Quick start</a>
@@ -802,6 +908,22 @@
             <a href="#docs">Docs</a>
         </div>
         <div class="nav-actions at-flx at-al-itm-ctr at-gap at-m" style="--at-gap: 10px; --at-m: 0 0 0 auto; flex-shrink: 0;">
+            <!-- Theme Mode Toggle: Default (System), Light, Dark -->
+            <div class="theme-toggle-group" id="theme-toggle-group" role="group" aria-label="Color Mode">
+                <button type="button" class="theme-btn active" data-mode="auto" title="Default (System)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <span>Auto</span>
+                </button>
+                <button type="button" class="theme-btn" data-mode="light" title="Light Mode">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <span>Light</span>
+                </button>
+                <button type="button" class="theme-btn" data-mode="dark" title="Dark Mode">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <span>Dark</span>
+                </button>
+            </div>
+
             <a class="at-btn at-btn-outln at-btn-sm" href="https://github.com/codersantosh/acmeticker" target="_blank" rel="noopener">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="flex-shrink: 0;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
                 Star on GitHub
@@ -1385,6 +1507,36 @@ function NewsTicker({ items }) {
 <script src="dist/acmeticker.min.js"></script>
 <script>
     (function () {
+        /* ---------- Theme Switcher Logic (Default/Auto, Light, Dark) ---------- */
+        var htmlEl = document.documentElement;
+        var themeBtns = document.querySelectorAll('#theme-toggle-group .theme-btn');
+
+        function setTheme(mode, persist) {
+            htmlEl.setAttribute('data-at-theme', mode);
+            themeBtns.forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+            });
+            if (persist && typeof localStorage !== 'undefined') {
+                localStorage.setItem('acmeTheme', mode);
+            }
+        }
+
+        themeBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var mode = btn.getAttribute('data-mode');
+                setTheme(mode, true);
+            });
+        });
+
+        // Initialize Theme from localStorage or default 'auto'
+        var savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('acmeTheme') : null;
+        if (savedTheme && ['auto', 'light', 'dark'].indexOf(savedTheme) !== -1) {
+            setTheme(savedTheme, false);
+        } else {
+            setTheme('auto', false);
+        }
+
+        /* ---------- Ticker Initializers ---------- */
         function initTicker(rootId, options) {
             var tickerEl = document.querySelector(rootId + ' .my-news-ticker');
             if (!tickerEl) {
