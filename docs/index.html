@@ -18,18 +18,25 @@
 
     <style>
         :root {
-            --brand: #1974d2;
-            --brand-hover: #145db0;
-            --brand-light: #eff6ff;
+            /* Framework Root Palette Tokens */
+            --at-primary: #1974d2;
+            --at-primary--hover: #145db0;
+            --at-white: #ffffff;
+            --at-black: #000000;
+            --at-base-color: #0f172a;
+            --at-body-color: #334155;
+            --at-quaternary: #64748b;
+            --at-ctnr: 1160px;
+            --at-gtr: 18px;
+            --at-fnt-fam: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            --at-scr-beh: smooth;
+
+            /* Visual Theming Tokens */
             --brand-glow: rgba(25, 116, 210, 0.22);
             --brand-accent: #38bdf8;
+            --brand-light: #eff6ff;
             --bg: #f8fafc;
             --surface: #ffffff;
-            --surface-elevated: #ffffff;
-            --surface-subtle: #f1f5f9;
-            --text: #0f172a;
-            --text-secondary: #334155;
-            --muted: #64748b;
             --border: #e2e8f0;
             --border-hover: #cbd5e1;
             --slate-900: #090d16;
@@ -44,31 +51,113 @@
             --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
             --shadow-md: 0 4px 12px -1px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
             --shadow-lg: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-            --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            --font: var(--at-fnt-fam);
             --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            --at-ctnr: 1160px;
-            --at-gtr: 18px;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
 
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: var(--at-scr-beh); }
 
         body {
             margin: 0;
             font-family: var(--font);
             background: var(--bg);
-            color: var(--text);
+            color: var(--at-base-color);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
         }
 
-        a { color: var(--brand); text-decoration: none; transition: color 0.15s ease; }
-        a:hover { color: var(--brand-hover); }
+        a { color: var(--at-primary); text-decoration: none; transition: color 0.15s ease; }
+        a:hover { color: var(--at-primary--hover); }
 
         .at-ticker { line-height: normal; }
+
+        /* ---------- Atomic Consumer Button System (.at-btn) ---------- */
+        .at-btn {
+            --at-cur: pointer;
+            --at-fnt-sz: 14px;
+            --at-fnt-wt: 600;
+            --at-ln-h: normal;
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: 8px;
+            --at-p: 9px 16px;
+            --at-trs: all 0.15s ease;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: var(--at-cur);
+            color: var(--at-cl, var(--at-base-color));
+            background-color: var(--at-bg-cl, transparent);
+            font-size: var(--at-fnt-sz);
+            font-weight: var(--at-fnt-wt);
+            font-family: var(--font);
+            border-color: var(--at-bdr-cl, transparent);
+            border-width: var(--at-bdr-w);
+            border-style: var(--at-bdr-sty);
+            border-radius: var(--at-bdr-rad);
+            padding: var(--at-p);
+            line-height: var(--at-ln-h);
+            white-space: nowrap;
+            transition: var(--at-trs);
+        }
+
+        .at-btn:hover { text-decoration: none; }
+        .at-btn:active { transform: translateY(1px); }
+
+        .at-btn-primary {
+            --at-cl: var(--at-white);
+            --at-bg-cl: var(--at-primary);
+            --at-bdr-cl: var(--at-primary);
+            --at-box-sdw: 0 2px 8px rgba(25, 116, 210, 0.28);
+            box-shadow: var(--at-box-sdw);
+        }
+        .at-btn-primary:hover {
+            --at-bg-cl: var(--at-primary--hover);
+            --at-bdr-cl: var(--at-primary--hover);
+            --at-box-sdw: 0 4px 12px rgba(25, 116, 210, 0.36);
+            color: var(--at-white);
+        }
+
+        .at-btn-outln {
+            --at-cl: var(--at-base-color);
+            --at-bg-cl: var(--at-white);
+            --at-bdr-cl: var(--border);
+            --at-box-sdw: var(--shadow-xs);
+            box-shadow: var(--at-box-sdw);
+        }
+        .at-btn-outln:hover {
+            --at-bdr-cl: var(--border-hover);
+            --at-bg-cl: #f8fafc;
+            --at-cl: var(--at-primary);
+            color: var(--at-primary);
+        }
+
+        .at-btn-ghost {
+            --at-cl: #e2e8f0;
+            --at-bg-cl: rgba(255, 255, 255, 0.08);
+            --at-bdr-cl: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(6px);
+        }
+        .at-btn-ghost:hover {
+            --at-bg-cl: rgba(255, 255, 255, 0.14);
+            --at-bdr-cl: rgba(255, 255, 255, 0.3);
+            --at-cl: var(--at-white);
+            color: var(--at-white);
+        }
+
+        .at-btn-sm {
+            --at-p: 6px 13px;
+            --at-fnt-sz: 13px;
+            --at-bdr-rad: 7px;
+        }
+
+        .icon { width: 16px; height: 16px; flex-shrink: 0; }
 
         /* ---------- Navbar ---------- */
         .nav {
@@ -76,16 +165,13 @@
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
-            transition: all 0.2s ease;
         }
 
-        .nav-inner {
-            height: 64px;
-        }
+        .nav-inner { height: 64px; }
 
         .nav-brand {
             font-weight: 800;
-            color: var(--text);
+            color: var(--at-base-color);
             font-size: 18px;
             letter-spacing: -0.02em;
             display: inline-flex;
@@ -99,17 +185,10 @@
             border-radius: 7px;
         }
 
-        .nav-brand:hover { text-decoration: none; color: var(--brand); }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: 20px;
-        }
+        .nav-brand:hover { text-decoration: none; color: var(--at-primary); }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--at-body-color);
             font-size: 14px;
             font-weight: 600;
             padding: 6px 12px;
@@ -118,77 +197,10 @@
         }
 
         .nav-links a:hover {
-            color: var(--brand);
+            color: var(--at-primary);
             background: var(--brand-light);
             text-decoration: none;
         }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
-
-        /* ---------- Buttons & Badges ---------- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 9px 18px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            font-family: var(--font);
-            white-space: nowrap;
-            transition: all 0.15s ease;
-        }
-
-        .btn:hover { text-decoration: none; }
-        .btn:active { transform: translateY(1px); }
-
-        .btn-primary {
-            background: var(--brand);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(25, 116, 210, 0.28);
-        }
-        .btn-primary:hover {
-            background: var(--brand-hover);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(25, 116, 210, 0.36);
-        }
-
-        .btn-ghost {
-            background: rgba(255, 255, 255, 0.08);
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            backdrop-filter: blur(6px);
-        }
-        .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-        }
-
-        .btn-outline {
-            background: #ffffff;
-            color: var(--text);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-xs);
-        }
-        .btn-outline:hover {
-            border-color: var(--border-hover);
-            background: #f8fafc;
-            color: var(--brand);
-        }
-
-        .btn-sm { padding: 6px 13px; font-size: 13px; border-radius: 7px; }
-
-        .icon { width: 16px; height: 16px; flex-shrink: 0; }
 
         /* ---------- Hero Section (Dark Obsidian Studio) ---------- */
         .hero {
@@ -223,8 +235,8 @@
         }
 
         .hero-badge-tag {
-            background: var(--brand);
-            color: #ffffff;
+            background: var(--at-primary);
+            color: var(--at-white);
             font-size: 11px;
             font-weight: 700;
             padding: 2px 7px;
@@ -239,7 +251,7 @@
             line-height: 1.12;
             letter-spacing: -0.035em;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--at-white);
             overflow-wrap: break-word;
         }
 
@@ -259,15 +271,6 @@
             font-size: 17.5px;
             line-height: 1.6;
             font-weight: 400;
-        }
-
-        .hero-cta {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-bottom: 38px;
         }
 
         .copy-install {
@@ -290,8 +293,8 @@
         }
 
         .copy-install .copy-btn {
-            background: var(--brand);
-            color: #ffffff;
+            background: var(--at-primary);
+            color: var(--at-white);
             border: 0;
             border-radius: 6px;
             padding: 6px 14px;
@@ -302,27 +305,21 @@
             transition: background 0.15s ease;
         }
 
-        .copy-install .copy-btn:hover { background: var(--brand-hover); }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
+        .copy-install .copy-btn:hover { background: var(--at-primary--hover); }
 
         .stat {
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            --at-p: 8px 16px;
+            --at-bdr-rad: 8px;
+            --at-bg-cl: rgba(255, 255, 255, 0.05);
+            --at-bdr-cl: rgba(255, 255, 255, 0.09);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
             font-size: 13.5px;
             color: #cbd5e1;
             backdrop-filter: blur(8px);
         }
 
-        .stat b { color: #ffffff; font-weight: 700; margin-right: 4px; }
+        .stat b { color: var(--at-white); font-weight: 700; margin-right: 4px; }
 
         /* ---------- Hero Ticker Container ---------- */
         .hero-ticker-wrap {
@@ -350,7 +347,7 @@
         }
 
         .hero-ticker .at-ticker-label {
-            --at-bg-cl: var(--brand);
+            --at-bg-cl: var(--at-primary);
             font-weight: 700;
             letter-spacing: 0.03em;
             text-transform: uppercase;
@@ -383,7 +380,7 @@
         }
 
         .section-head .kicker {
-            color: var(--brand);
+            color: var(--at-primary);
             font-size: 12.5px;
             font-weight: 800;
             text-transform: uppercase;
@@ -399,7 +396,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--brand);
+            background: var(--at-primary);
         }
 
         .section-head h2 {
@@ -407,55 +404,53 @@
             font-size: 32px;
             font-weight: 800;
             letter-spacing: -0.025em;
-            color: var(--text);
+            color: var(--at-base-color);
         }
 
         .section-head p {
             margin: 0;
-            color: var(--muted);
+            color: var(--at-quaternary);
             font-size: 16.5px;
             line-height: 1.6;
         }
 
         section[id] { scroll-margin-top: 80px; }
 
-        /* ---------- Features (8 Cards) ---------- */
+        /* ---------- Feature Cards ---------- */
         .feature {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: 24px 22px;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-md);
+            --at-box-sdw: var(--shadow-sm);
+            --at-p: 24px 22px;
+            --at-trs: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             height: 100%;
-            display: flex;
-            flex-direction: column;
         }
 
         .feature:hover {
-            box-shadow: var(--shadow-lg);
-            border-color: #b9d4f3;
+            --at-box-sdw: var(--shadow-lg);
+            --at-bdr-cl: #b9d4f3;
             transform: translateY(-3px);
         }
 
         .feature .f-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 11px;
-            background: var(--brand-light);
-            border: 1px solid rgba(25, 116, 210, 0.15);
-            color: var(--brand);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            flex-shrink: 0;
-            transition: transform 0.2s ease;
+            --at-w: 44px;
+            --at-h: 44px;
+            --at-bdr-rad: 11px;
+            --at-bg-cl: var(--brand-light);
+            --at-bdr-cl: rgba(25, 116, 210, 0.15);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-m: 0 0 16px 0;
+            --at-trs: transform 0.2s ease, background-color 0.2s ease;
+            color: var(--at-primary);
         }
 
         .feature:hover .f-icon {
+            --at-bg-cl: #dbeafe;
             transform: scale(1.06);
-            background: #dbeafe;
         }
 
         .feature .f-icon svg { width: 22px; height: 22px; }
@@ -465,38 +460,32 @@
             font-size: 16.5px;
             font-weight: 700;
             letter-spacing: -0.01em;
-            color: var(--text);
+            color: var(--at-base-color);
         }
 
         .feature p {
             margin: 0;
-            color: var(--muted);
+            color: var(--at-quaternary);
             font-size: 14px;
             line-height: 1.55;
         }
 
-        /* ---------- Live Stage (Engine Studio Workbench) ---------- */
+        /* ---------- Live Stage Workbench ---------- */
         .stage-workbench {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-lg);
+            --at-box-sdw: var(--shadow-md);
         }
 
         .stage-workbench-header {
-            background: #f8fafc;
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .window-dots {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            --at-bg-cl: #f8fafc;
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 0 0 1px 0;
+            --at-bdr-sty: solid;
+            --at-p: 12px 20px;
         }
 
         .dot {
@@ -513,7 +502,7 @@
             font-family: var(--mono);
             font-size: 12.5px;
             font-weight: 600;
-            color: var(--muted);
+            color: var(--at-quaternary);
         }
 
         .stage-workbench-badge {
@@ -552,18 +541,20 @@
         }
 
         .stage-note {
-            color: var(--muted);
+            color: var(--at-quaternary);
             font-size: 13.5px;
             margin: 22px 0 0;
         }
 
         /* ---------- RTL Showcase ---------- */
         .rtl-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            padding: 32px;
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-lg);
+            --at-box-sdw: var(--shadow-sm);
+            --at-p: 32px;
         }
 
         .rtl-copy h3 {
@@ -576,7 +567,7 @@
         .rtl-copy ul {
             margin: 0 0 20px;
             padding-left: 20px;
-            color: var(--text-secondary);
+            color: var(--at-body-color);
             font-size: 14.5px;
             line-height: 1.6;
         }
@@ -613,10 +604,13 @@
 
         /* ---------- Comparison Table ---------- */
         .compare {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-lg);
+            --at-box-sdw: var(--shadow-sm);
+            --at-ovf-x: auto;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -640,7 +634,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: var(--muted);
+            color: var(--at-quaternary);
         }
 
         .compare tbody tr:hover {
@@ -651,7 +645,7 @@
 
         .compare td:first-child {
             font-weight: 600;
-            color: var(--text);
+            color: var(--at-base-color);
             white-space: nowrap;
         }
 
@@ -680,53 +674,47 @@
 
         /* ---------- Quick Start Code Blocks ---------- */
         .code-block {
-            background: var(--slate-900);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: border-color 0.15s ease;
+            --at-bg-cl: var(--slate-900);
+            --at-bdr-cl: rgba(255, 255, 255, 0.08);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-md);
+            --at-box-sdw: var(--shadow-sm);
+            --at-trs: border-color 0.15s ease;
         }
 
         .code-block:hover {
-            border-color: rgba(56, 189, 248, 0.35);
+            --at-bdr-cl: rgba(56, 189, 248, 0.35);
         }
 
-        .code-block .cb-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        .cb-head {
+            --at-bg-cl: rgba(255, 255, 255, 0.03);
+            --at-bdr-cl: rgba(255, 255, 255, 0.08);
+            --at-bdr-w: 0 0 1px 0;
+            --at-bdr-sty: solid;
+            --at-p: 10px 16px;
         }
 
-        .code-block .cb-title {
+        .cb-title {
             color: #94a3b8;
             font-size: 13px;
             font-weight: 600;
             font-family: var(--mono);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .code-block .cb-copy {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #cbd5e1;
-            border-radius: 6px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: var(--font);
-            transition: all 0.15s ease;
+        .cb-copy {
+            --at-bg-cl: rgba(255, 255, 255, 0.08);
+            --at-bdr-cl: rgba(255, 255, 255, 0.14);
+            --at-cl: #cbd5e1;
+            --at-bdr-rad: 6px;
+            --at-p: 4px 12px;
+            --at-fnt-sz: 12px;
         }
 
-        .code-block .cb-copy:hover {
-            background: rgba(255, 255, 255, 0.16);
-            color: #ffffff;
+        .cb-copy:hover {
+            --at-bg-cl: rgba(255, 255, 255, 0.16);
+            --at-cl: var(--at-white);
+            color: var(--at-white);
         }
 
         .code-block pre {
@@ -741,44 +729,41 @@
 
         /* ---------- Demos Grid ---------- */
         .demo-card {
-            display: flex;
-            flex-direction: column;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 22px;
-            color: var(--text);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-md);
+            --at-p: 22px;
+            --at-box-sdw: var(--shadow-sm);
+            --at-trs: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--at-base-color);
             height: 100%;
-            position: relative;
         }
 
         .demo-card:hover {
-            box-shadow: var(--shadow-lg);
+            --at-box-sdw: var(--shadow-lg);
+            --at-bdr-cl: #93c5fd;
             transform: translateY(-3px);
-            border-color: #93c5fd;
             text-decoration: none;
         }
 
         .demo-card .dc-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--brand-light);
-            border: 1px solid rgba(25, 116, 210, 0.15);
-            color: var(--brand);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 14px;
-            flex-shrink: 0;
-            transition: transform 0.2s ease;
+            --at-w: 40px;
+            --at-h: 40px;
+            --at-bdr-rad: 10px;
+            --at-bg-cl: var(--brand-light);
+            --at-bdr-cl: rgba(25, 116, 210, 0.15);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-m: 0 0 14px 0;
+            --at-trs: transform 0.2s ease, background-color 0.2s ease;
+            color: var(--at-primary);
         }
 
         .demo-card:hover .dc-icon {
+            --at-bg-cl: #dbeafe;
             transform: scale(1.08);
-            background: #dbeafe;
         }
 
         .demo-card .dc-icon svg { width: 20px; height: 20px; }
@@ -788,39 +773,39 @@
             font-size: 16px;
             font-weight: 700;
             letter-spacing: -0.01em;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            color: var(--at-base-color);
         }
 
         .demo-card h3::after {
             content: '→';
             font-weight: 400;
-            color: var(--muted);
+            color: var(--at-quaternary);
             transition: transform 0.15s ease, color 0.15s ease;
         }
 
         .demo-card:hover h3::after {
             transform: translateX(4px);
-            color: var(--brand);
+            color: var(--at-primary);
         }
 
         .demo-card p {
             margin: 0;
-            color: var(--muted);
+            color: var(--at-quaternary);
             font-size: 13.5px;
             line-height: 1.5;
         }
 
         /* ---------- API Reference ---------- */
         .api-table-wrap {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: var(--radius-lg);
+            --at-box-sdw: var(--shadow-sm);
+            --at-ovf-x: auto;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            box-shadow: var(--shadow-sm);
         }
 
         .api-table-wrap table {
@@ -842,7 +827,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: var(--muted);
+            color: var(--at-quaternary);
         }
 
         .api-table-wrap tbody tr:hover { background: #f8fafc; }
@@ -855,36 +840,35 @@
             padding: 2px 7px;
             font-family: var(--mono);
             font-size: 12.5px;
-            color: var(--brand-hover);
+            color: var(--at-primary--hover);
             font-weight: 600;
         }
 
         .methods {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 18px;
+            --at-m: 18px 0 0 0;
         }
 
         .method-chip {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 7px 16px;
+            --at-bg-cl: var(--surface);
+            --at-bdr-cl: var(--border);
+            --at-bdr-w: 1px;
+            --at-bdr-sty: solid;
+            --at-bdr-rad: 999px;
+            --at-p: 7px 16px;
+            --at-box-sdw: var(--shadow-xs);
+            --at-trs: all 0.15s ease;
             font-size: 13.5px;
-            color: var(--text-secondary);
-            box-shadow: var(--shadow-xs);
-            transition: all 0.15s ease;
+            color: var(--at-body-color);
         }
 
         .method-chip:hover {
-            border-color: #93c5fd;
-            background: #eff6ff;
+            --at-bdr-cl: #93c5fd;
+            --at-bg-cl: #eff6ff;
             transform: translateY(-1px);
         }
 
         .method-chip code {
-            color: var(--brand);
+            color: var(--at-primary);
             font-family: var(--mono);
             font-weight: 700;
             margin-right: 4px;
@@ -892,9 +876,12 @@
 
         /* ---------- Footer ---------- */
         .footer {
-            background: var(--slate-900);
-            color: #94a3b8;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            --at-bg-cl: var(--slate-900);
+            --at-cl: #94a3b8;
+            --at-bdr-cl: rgba(255, 255, 255, 0.08);
+            --at-bdr-w: 1px 0 0 0;
+            --at-bdr-sty: solid;
+            --at-m: 90px 0 0 0;
         }
 
         .footer-inner {
@@ -902,7 +889,7 @@
         }
 
         .footer h4 {
-            color: #ffffff;
+            color: var(--at-white);
             margin: 0 0 16px;
             font-size: 14.5px;
             font-weight: 700;
@@ -912,14 +899,11 @@
         .footer ul { list-style: none; margin: 0; padding: 0; }
         .footer li { margin: 9px 0; font-size: 14px; }
         .footer a { color: #94a3b8; }
-        .footer a:hover { color: #ffffff; text-decoration: none; }
+        .footer a:hover { color: var(--at-white); text-decoration: none; }
 
         .footer-brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--at-white);
             font-size: 17px;
             margin-bottom: 12px;
         }
@@ -928,7 +912,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding: 20px;
             font-size: 13px;
-            color: #64748b;
+            color: var(--at-quaternary);
         }
 
         /* ---------- Responsive Breakpoints ---------- */
@@ -942,15 +926,15 @@
 
         @media (max-width: 480px) {
             .nav-brand { font-size: 16px; }
-            .btn-sm { padding: 5px 9px; font-size: 12px; }
-            .hero-cta { flex-direction: column; align-items: stretch; }
+            .at-btn-sm { --at-p: 5px 9px; --at-fnt-sz: 12px; }
+            .hero-cta { flex-direction: column !important; align-items: stretch !important; }
             .hero-cta > * { justify-content: center; text-align: center; }
             .section-head h2 { font-size: 26px; }
             .rtl-card { padding: 16px !important; }
         }
 
         @media (max-width: 360px) {
-            .nav-actions a.btn-outline { display: none; }
+            .nav-actions a.at-btn-outln { display: none !important; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -968,19 +952,19 @@
             <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1974d2"/><rect x="6" y="9" width="20" height="3.5" rx="1.75" fill="white"/><rect x="6" y="16.5" width="13" height="3.5" rx="1.75" fill="white"/><rect x="6" y="24" width="17" height="3.5" rx="1.75" fill="white"/></svg>
             AcmeTicker
         </a>
-        <div class="nav-links">
+        <div class="nav-links at-flx at-al-itm-ctr at-gap" style="--at-gap: 6px; margin-left: 20px;">
             <a href="#features">Features</a>
             <a href="#demos">Live demos</a>
             <a href="#quickstart">Quick start</a>
             <a href="#api">API</a>
             <a href="#docs">Docs</a>
         </div>
-        <div class="nav-actions">
-            <a class="btn btn-outline btn-sm" href="https://github.com/codersantosh/acmeticker" target="_blank" rel="noopener">
+        <div class="nav-actions at-flx at-al-itm-ctr at-gap at-m" style="--at-gap: 10px; --at-m: 0 0 0 auto; flex-shrink: 0;">
+            <a class="at-btn at-btn-outln at-btn-sm" href="https://github.com/codersantosh/acmeticker" target="_blank" rel="noopener">
                 <svg class="icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
                 Star on GitHub
             </a>
-            <a class="btn btn-primary btn-sm" href="https://www.npmjs.com/package/acmeticker" target="_blank" rel="noopener">npm v2.0</a>
+            <a class="at-btn at-btn-primary at-btn-sm" href="https://www.npmjs.com/package/acmeticker" target="_blank" rel="noopener">npm v2.0</a>
         </div>
     </div>
 </nav>
@@ -994,22 +978,22 @@
         </span>
         <h1>The zero-dependency news ticker for the <em>modern web</em></h1>
         <p class="hero-sub">Four battle-tested engines — vertical, horizontal, marquee and typewriter — with full RTL mirroring, first-class TypeScript types, and a sub-2 kB footprint.</p>
-        <div class="hero-cta">
-            <button class="copy-install at-inl-flx at-al-itm-ctr" id="hero-copy" aria-label="Copy npm install command" style="--at-gap: 12px;">
+        <div class="hero-cta at-flx at-jfy-cont-ctr at-al-itm-ctr at-flx-wrp at-gap" style="--at-gap: 14px; margin-bottom: 38px;">
+            <button class="copy-install at-inl-flx at-al-itm-ctr at-gap" id="hero-copy" aria-label="Copy npm install command" style="--at-gap: 12px;">
                 <span>$ npm i acmeticker</span>
                 <span class="copy-btn" id="hero-copy-btn">Copy</span>
             </button>
-            <a class="btn btn-ghost" href="#demos">
+            <a class="at-btn at-btn-ghost" href="#demos">
                 <span>View live demos</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
         </div>
-        <div class="hero-stats">
-            <span class="stat"><b>0</b> runtime dependencies</span>
-            <span class="stat"><b>4</b> ticker engines</span>
-            <span class="stat"><b>97.4 kB</b> packed</span>
-            <span class="stat"><b>RTL</b> built in</span>
-            <span class="stat"><b>ESM + CJS</b> + global build</span>
+        <div class="hero-stats at-flx at-jfy-cont-ctr at-flx-wrp at-gap" style="--at-gap: 10px; margin-bottom: 12px;">
+            <span class="stat at-inl-flx at-al-itm-ctr at-gap at-p at-bdr-rad at-bg-cl at-bdr at-txt" style="--at-gap: 4px;"><b>0</b> runtime dependencies</span>
+            <span class="stat at-inl-flx at-al-itm-ctr at-gap at-p at-bdr-rad at-bg-cl at-bdr at-txt" style="--at-gap: 4px;"><b>4</b> ticker engines</span>
+            <span class="stat at-inl-flx at-al-itm-ctr at-gap at-p at-bdr-rad at-bg-cl at-bdr at-txt" style="--at-gap: 4px;"><b>97.4 kB</b> packed</span>
+            <span class="stat at-inl-flx at-al-itm-ctr at-gap at-p at-bdr-rad at-bg-cl at-bdr at-txt" style="--at-gap: 4px;"><b>RTL</b> built in</span>
+            <span class="stat at-inl-flx at-al-itm-ctr at-gap at-p at-bdr-rad at-bg-cl at-bdr at-txt" style="--at-gap: 4px;"><b>ESM + CJS</b> + global build</span>
         </div>
     </div>
 
@@ -1046,57 +1030,57 @@
         </div>
         <div class="features-row at-row at-row-gap" style="--at-row-gap: 20px;">
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                     <h3>Zero dependencies</h3>
                     <p>Vanilla JavaScript only. No jQuery, no runtime bloat — clean, modern, and tree-shakeable.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
                     <h3>Four engines</h3>
                     <p>Vertical, horizontal, continuous marquee and typewriter modes, switchable dynamically with <code>update()</code>.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                     <h3>Full RTL support</h3>
                     <p>Automatic direction detection and motion mirroring on Arabic and Hebrew layouts without manual config.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55L16.5 14.6a1.78 1.78 0 0 0 0-3.2z"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55L16.5 14.6a1.78 1.78 0 0 0 0-3.2z"/></svg></div>
                     <h3>TypeScript types</h3>
                     <p>Complete type definitions shipped with the package. Fully compatible with NodeNext and bundler resolution.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></svg></div>
                     <h3>Accessible by default</h3>
                     <p>Pauses on hover and focus, respects <code>prefers-reduced-motion</code>, and manages <code>aria-live</code> regions cleanly.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                     <h3>RAF animations</h3>
                     <p>Silky 60fps transitions driven by requestAnimationFrame. <code>autoplay: 0</code> loops continuously.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
                     <h3>Events &amp; controls</h3>
                     <p>Native <code>acmeTickerCycle</code> and <code>acmeTickerToggle</code> custom events. Flexible selector/element binding.</p>
                 </div>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <div class="feature">
-                    <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+                <div class="feature at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs">
+                    <div class="f-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
                     <h3>Universal builds</h3>
                     <p>Shipped in ESM, CommonJS and global UMD formats. Works with Vite, Next.js, Webpack, or simple script tags.</p>
                 </div>
@@ -1111,9 +1095,9 @@
             <h2>Four engines, one line of HTML</h2>
             <p>Experience all four ticker modes running live with real controls and transition easing.</p>
         </div>
-        <div class="stage-workbench">
-            <div class="stage-workbench-header">
-                <div class="window-dots">
+        <div class="stage-workbench at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf">
+            <div class="stage-workbench-header at-flx at-al-itm-ctr at-jfy-cont-btw at-bdr at-bg-cl at-p">
+                <div class="window-dots at-flx at-al-itm-ctr at-gap" style="--at-gap: 6px;">
                     <span class="dot dot-red"></span>
                     <span class="dot dot-yellow"></span>
                     <span class="dot dot-green"></span>
@@ -1205,7 +1189,7 @@
             <h2>Arabic and Hebrew, out of the box</h2>
             <p>Point AcmeTicker at a <code>dir="rtl"</code> container and motion, rest positions, and controls mirror automatically.</p>
         </div>
-        <div class="rtl-card">
+        <div class="rtl-card at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p">
             <div class="at-row at-row-gap at-al-itm-st" style="--at-row-gap: 28px;">
                 <div class="at-col-md-6 at-col-12">
                     <div class="rtl-copy">
@@ -1226,7 +1210,7 @@ new AcmeTicker('.my-news-ticker', {
                     </div>
                 </div>
                 <div class="at-col-md-6 at-col-12">
-                    <div class="rtl-ticker-holder">
+                    <div class="rtl-ticker-holder at-flx at-flx-col at-jfy-cont-ctr at-h" style="--at-h: 100%;">
                         <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg rtl-ticker" id="rtl-ticker">
                             <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">أخبار</div>
                             <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
@@ -1255,7 +1239,7 @@ new AcmeTicker('.my-news-ticker', {
             <h2>v1 vs v2 Architecture</h2>
             <p>The v2 rewrite preserves familiar v1 APIs while eliminating legacy dependencies and modernizing performance.</p>
         </div>
-        <div class="compare">
+        <div class="compare at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf-x">
             <table>
                 <thead>
                     <tr><th>Capability</th><th>v1 (jQuery Plugin)</th><th>v2 (Modern Vanilla)</th></tr>
@@ -1284,26 +1268,26 @@ new AcmeTicker('.my-news-ticker', {
 
         <div class="at-row at-row-gap" style="--at-row-gap: 16px;">
             <div class="at-col-md-6 at-col-12">
-                <div class="code-block" data-code>
-                    <div class="cb-head">
-                        <span class="cb-title">
+                <div class="code-block at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf at-trs" data-code>
+                    <div class="cb-head at-flx at-al-itm-ctr at-jfy-cont-btw at-bdr at-bg-cl at-p">
+                        <span class="cb-title at-inl-flx at-al-itm-ctr at-gap" style="--at-gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
                             npm install
                         </span>
-                        <button class="cb-copy" type="button">Copy</button>
+                        <button class="at-btn cb-copy" type="button">Copy</button>
                     </div>
                     <pre>npm install acmeticker</pre>
                 </div>
             </div>
 
             <div class="at-col-md-6 at-col-12">
-                <div class="code-block" data-code>
-                    <div class="cb-head">
-                        <span class="cb-title">
+                <div class="code-block at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf at-trs" data-code>
+                    <div class="cb-head at-flx at-al-itm-ctr at-jfy-cont-btw at-bdr at-bg-cl at-p">
+                        <span class="cb-title at-inl-flx at-al-itm-ctr at-gap" style="--at-gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
                             Plain Script Tag
                         </span>
-                        <button class="cb-copy" type="button">Copy</button>
+                        <button class="at-btn cb-copy" type="button">Copy</button>
                     </div>
                     <pre>&lt;script src="https://cdn.jsdelivr.net/npm/acmeticker@2.0.0/dist/acmeticker.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
@@ -1316,13 +1300,13 @@ new AcmeTicker('.my-news-ticker', {
             </div>
 
             <div class="at-col-md-6 at-col-12">
-                <div class="code-block" data-code>
-                    <div class="cb-head">
-                        <span class="cb-title">
+                <div class="code-block at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf at-trs" data-code>
+                    <div class="cb-head at-flx at-al-itm-ctr at-jfy-cont-btw at-bdr at-bg-cl at-p">
+                        <span class="cb-title at-inl-flx at-al-itm-ctr at-gap" style="--at-gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55L16.5 14.6a1.78 1.78 0 0 0 0-3.2z"/></svg>
                             Vanilla / Bundlers (ESM)
                         </span>
-                        <button class="cb-copy" type="button">Copy</button>
+                        <button class="at-btn cb-copy" type="button">Copy</button>
                     </div>
                     <pre>import { AcmeTicker } from 'acmeticker';
 
@@ -1342,13 +1326,13 @@ const ticker = new AcmeTicker(document.querySelector('ul.ticker'), {
             </div>
 
             <div class="at-col-md-6 at-col-12">
-                <div class="code-block" data-code>
-                    <div class="cb-head">
-                        <span class="cb-title">
+                <div class="code-block at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf at-trs" data-code>
+                    <div class="cb-head at-flx at-al-itm-ctr at-jfy-cont-btw at-bdr at-bg-cl at-p">
+                        <span class="cb-title at-inl-flx at-al-itm-ctr at-gap" style="--at-gap: 8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 1 0 0 8.49M7.76 16.24a6 6 0 1 0 0-8.49"/></svg>
                             React Component
                         </span>
-                        <button class="cb-copy" type="button">Copy</button>
+                        <button class="at-btn cb-copy" type="button">Copy</button>
                     </div>
                     <pre>import { useEffect, useRef } from 'react';
 import { AcmeTicker } from 'acmeticker';
@@ -1383,57 +1367,57 @@ function NewsTicker({ items }) {
         </div>
         <div class="demos-row at-row at-row-gap" style="--at-row-gap: 16px;">
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/index.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/index.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
                     <h3>All Four Types</h3>
                     <p>Vertical, horizontal, marquee and typewriter together on one page.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/vertical.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/vertical.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg></div>
                     <h3>Vertical</h3>
                     <p>The classic top-to-bottom breaking news ticker layout.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/horizontal.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/horizontal.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
                     <h3>Horizontal</h3>
                     <p>Smooth slide transitions with prev/next navigation controls.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/marquee.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h20v8H2zM7 12h10"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/marquee.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h20v8H2zM7 12h10"/></svg></div>
                     <h3>Marquee</h3>
                     <p>Continuous pixel-perfect scrolling with seamless infinite duplication.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/typewriter.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/typewriter.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M8 9h8M8 13h5"/></svg></div>
                     <h3>Typewriter</h3>
                     <p>Character-by-character headline typing effect with hold time.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/rtl.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V4M17 20V4M5 20h4M15 4h4"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/rtl.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V4M17 20V4M5 20h4M15 4h4"/></svg></div>
                     <h3>Arabic / RTL</h3>
                     <p>Every engine mirrored under <code>dir="rtl"</code> with direction overrides.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/react/index.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/react/index.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
                     <h3>React Demo</h3>
                     <p>Clean React integration using <code>useRef</code> lifecycle and atomic styles.</p>
                 </a>
             </div>
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
-                <a class="demo-card" href="examples/react/rtl.html">
-                    <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
+                <a class="demo-card at-flx at-flx-col at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs at-pos" href="examples/react/rtl.html">
+                    <div class="dc-icon at-flx at-al-itm-ctr at-jfy-cont-ctr at-flx-srnk-0 at-bdr at-bdr-rad at-bg-cl at-m at-trs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
                     <h3>React RTL Demo</h3>
                     <p>Bidirectional Arabic news ticker running inside React tree.</p>
                 </a>
@@ -1448,7 +1432,7 @@ function NewsTicker({ items }) {
             <h2>Options and Methods API</h2>
             <p>A compact, intuitive API surface designed for maximum control with zero configuration overhead.</p>
         </div>
-        <div class="api-table-wrap">
+        <div class="api-table-wrap at-bdr at-bdr-rad at-bg-cl at-box-sdw at-ovf-x">
             <table>
                 <thead>
                     <tr><th>Option</th><th>Default</th><th>Description</th></tr>
@@ -1465,24 +1449,24 @@ function NewsTicker({ items }) {
                 </tbody>
             </table>
         </div>
-        <div class="methods">
-            <span class="method-chip"><code>play()</code> resume</span>
-            <span class="method-chip"><code>pause()</code> freeze</span>
-            <span class="method-chip"><code>toggle()</code> flip</span>
-            <span class="method-chip"><code>next()</code> / <code>prev()</code> navigate</span>
-            <span class="method-chip"><code>update()</code> re-configure</span>
-            <span class="method-chip"><code>destroy()</code> teardown</span>
+        <div class="methods at-flx at-flx-wrp at-gap at-m" style="--at-gap: 10px; --at-m: 18px 0 0 0;">
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>play()</code> resume</span>
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>pause()</code> freeze</span>
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>toggle()</code> flip</span>
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>next()</code> / <code>prev()</code> navigate</span>
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>update()</code> re-configure</span>
+            <span class="method-chip at-inl-flx at-al-itm-ctr at-bdr at-bdr-rad at-bg-cl at-box-sdw at-p at-trs"><code>destroy()</code> teardown</span>
         </div>
     </section>
 </main>
 
 <!-- Footer -->
-<footer class="footer at-m" id="docs" style="--at-m: 90px 0 0;">
+<footer class="footer at-m at-bdr at-bg-cl at-cl" id="docs" style="--at-m: 90px 0 0 0;">
     <div class="at-ctnr footer-inner">
         <div class="footer-row at-row at-row-gap" style="--at-row-gap: 36px;">
             <div class="at-col-lg-3 at-col-md-6 at-col-12">
                 <div>
-                    <div class="footer-brand">
+                    <div class="footer-brand at-inl-flx at-al-itm-ctr at-gap" style="--at-gap: 8px;">
                         <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1974d2"/><rect x="6" y="9" width="20" height="3.5" rx="1.75" fill="white"/><rect x="6" y="16.5" width="13" height="3.5" rx="1.75" fill="white"/><rect x="6" y="24" width="17" height="3.5" rx="1.75" fill="white"/></svg>
                         AcmeTicker
                     </div>
