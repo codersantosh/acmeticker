@@ -593,9 +593,6 @@ var AcmeTicker = (() => {
         first.style[styleProp] = "0px";
       }
     }
-    horizontalBoxWidth() {
-      return this.host.wrap.offsetWidth;
-    }
     styleProp() {
       if (this.horizontal) {
         return this.host.rtl ? "right" : "left";
@@ -610,15 +607,11 @@ var AcmeTicker = (() => {
     }
     animate(el) {
       const styleProp = this.styleProp();
-      let negative = this.host.options.direction === "up" || this.host.options.direction === "right";
-      const rtlHorizontal = this.horizontal && this.host.rtl;
-      if (rtlHorizontal) {
-        negative = !negative;
-      }
+      const negative = this.host.options.direction === "up" || this.host.options.direction === "right";
       el.style.display = "block";
       el.style.position = "absolute";
       const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
-      const from = rtlHorizontal ? negative ? -(this.horizontalBoxWidth() + travel) : travel : negative ? -travel : travel;
+      const from = negative ? -travel : travel;
       const rest = 0;
       for (const li of directLiChildren(this.host.element)) {
         li.style.opacity = "0";

@@ -147,10 +147,6 @@ export class VerticalHorizontalEngine implements TickerEngine {
     }
   }
 
-  private horizontalBoxWidth(): number {
-    return this.host.wrap.offsetWidth;
-  }
-
   private styleProp(): StyleProp {
     if (this.horizontal) {
       return this.host.rtl ? 'right' : 'left';
@@ -167,22 +163,12 @@ export class VerticalHorizontalEngine implements TickerEngine {
 
   private animate(el: HTMLElement): void {
     const styleProp = this.styleProp();
-    let negative =
+    const negative =
       this.host.options.direction === 'up' || this.host.options.direction === 'right';
-    const rtlHorizontal = this.horizontal && this.host.rtl;
-    if (rtlHorizontal) {
-      negative = !negative;
-    }
     el.style.display = 'block';
     el.style.position = 'absolute';
     const travel = this.horizontal ? outerWidth(el) : Math.max(outerHeight(el), this.visibleHeight());
-    const from = rtlHorizontal
-      ? negative
-        ? -(this.horizontalBoxWidth() + travel)
-        : travel
-      : negative
-        ? -travel
-        : travel;
+    const from = negative ? -travel : travel;
     const rest = 0;
 
     for (const li of directLiChildren(this.host.element)) {

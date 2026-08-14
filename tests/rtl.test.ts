@@ -177,12 +177,12 @@ describe('marquee rtl mirroring', () => {
 });
 
 describe('horizontal rtl mirroring', () => {
-  it('rtl + direction left enters off-screen left and rests flush right', () => {
+  it('rtl + direction left starts inset and slides rightward to flush right', () => {
     const rtl = mount('horizontal', { direction: 'left', autoplay: 1000, speed: 600 }, 'dir="rtl"');
     vi.advanceTimersByTime(1000);
     raf.step(0);
     const first = rtl.ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
-    expect(parseFloat(first.style.right)).toBe(-(BOX_WIDTH + 120));
+    expect(parseFloat(first.style.right)).toBe(120);
 
     raf.step(600);
     expect(first.style.right).toBe('0px');
@@ -193,7 +193,7 @@ describe('horizontal rtl mirroring', () => {
     vi.advanceTimersByTime(1000);
     raf.step(0);
     const first = rtl.ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
-    expect(parseFloat(first.style.right)).toBe(120);
+    expect(parseFloat(first.style.right)).toBe(-120);
 
     raf.step(600);
     expect(first.style.right).toBe('0px');
@@ -229,7 +229,7 @@ describe('horizontal rtl mirroring', () => {
     vi.advanceTimersByTime(1000);
     raf.step(0);
     const first = ul.querySelector<HTMLElement>(':scope > li:first-child') as HTMLElement;
-    expect(parseFloat(first.style.right)).toBe(120);
+    expect(parseFloat(first.style.right)).toBe(-120);
 
     raf.step(600);
     expect(first.style.right).toBe('0px');
