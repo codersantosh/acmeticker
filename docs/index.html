@@ -3,106 +3,632 @@
 <head>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231974d2%22/><rect x=%226%22 y=%2210%22 width=%2220%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2217%22 width=%2214%22 height=%223%22 fill=%22white%22/><rect x=%226%22 y=%2224%22 width=%2218%22 height=%223%22 fill=%22white%22/></svg>">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AcmeTicker - a zero-dependency vanilla JS news ticker with vertical, horizontal, marquee and typewriter modes, full RTL support and TypeScript types.">
     <title>AcmeTicker - Vanilla JS News Ticker</title>
     <link rel="stylesheet" href="examples/atomic.min.css">
     <link rel="stylesheet" href="examples/at-ticker.css">
     <style>
+        :root {
+            --brand: #1974d2;
+            --brand-dark: #145aa5;
+            --brand-soft: #eaf3fc;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --slate: #0f172a;
+            --slate-2: #1e293b;
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 6px 24px rgba(15, 23, 42, 0.08);
+            --font: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
             margin: 0;
-            background: #f6f8fb;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .at-doc {
-            max-width: 900px;
+        a { color: var(--brand); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .at-ticker { line-height: normal; }
+
+        /* ---------- Nav ---------- */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 40px 20px 80px;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
         }
 
-        .at-doc h1 {
-            margin: 0 0 6px;
-            font-size: 30px;
-            color: #1a1a1a;
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: var(--text);
+            font-size: 17px;
         }
 
-        .at-doc .at-tagline {
-            margin: 0 0 18px;
-            color: #555;
+        .nav-brand:hover { text-decoration: none; }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            margin-left: 8px;
         }
 
-        .at-doc .at-links a {
-            color: #1974d2;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .at-doc .at-links a:hover {
-            text-decoration: underline;
-        }
-
-        .at-doc h2 {
-            --at-m: 40px 0 10px;
-            font-size: 20px;
-            color: #1a1a1a;
-        }
-
-        .at-doc ul.at-demo-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .at-doc ul.at-demo-list li {
-            margin: 6px 0;
-        }
-
-        .at-doc ul.at-demo-list a {
-            color: #1974d2;
-            text-decoration: none;
-        }
-
-        .at-doc ul.at-demo-list a:hover {
-            text-decoration: underline;
-        }
-
-        .at-doc .at-muted {
-            color: #777;
+        .nav-links a {
+            color: var(--muted);
             font-size: 14px;
+            font-weight: 500;
         }
 
-        .at-doc pre {
-            background: #1e1e2e;
-            color: #cdd6f4;
-            padding: 14px 16px;
-            border-radius: 6px;
-            overflow-x: auto;
+        .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+        .nav-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+            font-family: var(--font);
+        }
+
+        .btn:hover { text-decoration: none; }
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary { background: var(--brand); color: #fff; }
+        .btn-primary:hover { background: var(--brand-dark); }
+
+        .btn-ghost { background: transparent; color: #cbd5e1; border-color: rgba(255, 255, 255, 0.25); }
+        .btn-ghost:hover { border-color: rgba(255, 255, 255, 0.5); color: #fff; }
+
+        .btn-outline { background: var(--surface); color: var(--text); border-color: var(--border); }
+        .btn-outline:hover { border-color: #b6c4d6; }
+
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+        .icon { width: 16px; height: 16px; flex: none; }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            background:
+                radial-gradient(900px 400px at 85% -10%, rgba(25, 116, 210, 0.35), transparent 60%),
+                radial-gradient(700px 350px at 10% 110%, rgba(25, 116, 210, 0.22), transparent 60%),
+                linear-gradient(180deg, var(--slate), var(--slate-2));
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 84px 20px 40px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: rgba(25, 116, 210, 0.18);
+            border: 1px solid rgba(25, 116, 210, 0.45);
+            color: #93c5fd;
             font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
 
-        .at-doc code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        .hero h1 {
+            margin: 22px auto 14px;
+            max-width: 760px;
+            font-size: clamp(30px, 5vw, 46px);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: #fff;
         }
 
-        .at-doc .at-demo-wrap {
-            margin: 0 0 26px;
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(90deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-sub {
+            max-width: 640px;
+            margin: 0 auto 30px;
+            color: #94a3b8;
+            font-size: 17px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 34px;
+        }
+
+        .copy-install {
+            font-family: var(--mono);
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 8px 10px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .copy-install:hover { border-color: rgba(255, 255, 255, 0.4); }
+
+        .copy-install .copy-btn {
+            background: var(--brand);
+            color: #fff;
+            border: 0;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
+        .copy-install .copy-btn:hover { background: var(--brand-dark); }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .stat {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13.5px;
+            color: #cbd5e1;
+        }
+
+        .stat b { color: #fff; font-weight: 700; }
+
+        .hero-ticker-wrap {
+            max-width: 1100px;
+            margin: 40px auto 0;
+            padding: 0 20px;
+        }
+
+        .hero-ticker {
+            --at-bg-cl: rgba(255, 255, 255, 0.05);
+            --at-bdr-cl: rgba(255, 255, 255, 0.14);
+            --at-bdr-w: 1px;
+            --at-m: 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .hero-ticker .at-ticker-label { --at-bg-cl: var(--brand); }
+
+        .hero-ticker .at-ticker-controls button {
+            --at-bg-cl: rgba(255, 255, 255, 0.06);
+            --at-bdr-cl: rgba(255, 255, 255, 0.14);
+        }
+
+        .hero-ticker .at-ticker-controls button:hover { --at-bg-cl: rgba(255, 255, 255, 0.12); }
+
+        .hero-ticker .at-ticker-controls button:after { border-color: #cbd5e1; }
+        .hero-ticker .at-ticker-pause:before { border-color: #cbd5e1; }
+        .hero-ticker .at-ticker-pause.is-paused:before { border-left-color: #cbd5e1; }
+
+        /* ---------- Sections ---------- */
+        .section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 72px 20px 0;
+        }
+
+        .section-head {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 40px;
+        }
+
+        .section-head .kicker {
+            color: var(--brand);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .section-head h2 {
+            margin: 0 0 12px;
+            font-size: 30px;
+            letter-spacing: -0.02em;
+        }
+
+        .section-head p { margin: 0; color: var(--muted); font-size: 16px; }
+
+        section[id] { scroll-margin-top: 76px; }
+
+        /* ---------- Features ---------- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 20px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .feature:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+        .feature .f-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .feature .f-icon svg { width: 20px; height: 20px; }
+
+        .feature h3 { margin: 0 0 6px; font-size: 16px; }
+
+        .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+        /* ---------- Live stage ---------- */
+        .stage {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 28px;
+        }
+
+        .stage .stage-note {
+            margin: 18px 0 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13.5px;
+        }
+
+        /* ---------- RTL showcase ---------- */
+        .rtl-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .rtl-grid .rtl-copy h3 { margin: 0 0 10px; font-size: 19px; }
+
+        .rtl-grid ul { margin: 0 0 16px; padding-left: 20px; color: var(--muted); font-size: 15px; }
+
+        .rtl-grid .rtl-copy pre {
+            background: var(--slate);
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .rtl-ticker { --at-m: 0; }
+
+        /* ---------- Comparison ---------- */
+        .compare {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .compare table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+
+        .compare th, .compare td {
+            padding: 12px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare th { background: #f1f5f9; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+        .compare tr:last-child td { border-bottom: 0; }
+
+        .compare td:first-child { font-weight: 600; white-space: nowrap; }
+
+        .compare .no { color: #b45309; font-weight: 600; }
+        .compare .yes { color: #047857; font-weight: 600; }
+
+        /* ---------- Quick start ---------- */
+        .code-block {
+            background: var(--slate);
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .code-block .cb-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .code-block .cb-title { color: #94a3b8; font-size: 13px; font-weight: 600; }
+
+        .code-block .cb-copy {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #cbd5e1;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
+        .code-block .cb-copy:hover { background: rgba(255, 255, 255, 0.14); }
+
+        .code-block pre {
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+            color: #e2e8f0;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        /* ---------- Demos grid ---------- */
+        .demos {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .demo-card {
+            display: block;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            color: var(--text);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+        }
+
+        .demo-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: #b9d4f3;
+            text-decoration: none;
+        }
+
+        .demo-card .dc-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .demo-card .dc-icon svg { width: 18px; height: 18px; }
+
+        .demo-card h3 { margin: 0 0 4px; font-size: 15.5px; }
+
+        .demo-card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+        /* ---------- API ---------- */
+        .api-table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 22px;
+        }
+
+        .api-table-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+        .api-table-wrap th, .api-table-wrap td { padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+
+        .api-table-wrap th { background: #f1f5f9; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+        .api-table-wrap tr:last-child td { border-bottom: 0; }
+
+        .api-table-wrap code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: #0f3d63;
+        }
+
+        .methods { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .method-chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .method-chip code { color: var(--brand); font-family: var(--mono); font-weight: 600; }
+
+        /* ---------- Footer ---------- */
+        .footer {
+            margin-top: 80px;
+            background: var(--slate);
+            color: #94a3b8;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 44px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: space-between;
+        }
+
+        .footer h4 { color: #fff; margin: 0 0 12px; font-size: 14px; }
+
+        .footer ul { list-style: none; margin: 0; padding: 0; }
+
+        .footer li { margin: 7px 0; font-size: 14px; }
+
+        .footer a { color: #94a3b8; }
+
+        .footer a:hover { color: #fff; text-decoration: none; }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1080px) {
+            .features, .demos { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 720px) {
+            .nav-links { display: none; }
+            .features, .demos { grid-template-columns: 1fr; }
+            .rtl-grid { grid-template-columns: 1fr; }
+            .hero-inner { padding-top: 56px; }
+            .stage { padding: 18px; }
+            .compare th, .compare td { padding: 10px 12px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
 <body>
 
-<div class="at-doc">
-    <h1>AcmeTicker</h1>
-    <p class="at-tagline">A zero-dependency vanilla JS news ticker with vertical, horizontal, marquee and typewriter modes, full RTL support, and a jQuery-free successor to the v1 plugin.</p>
-    <p class="at-links">
-        <a href="https://github.com/codersantosh/acmeticker">GitHub</a> &middot;
-        <a href="https://www.npmjs.com/package/acmeticker">npm</a> &middot;
-        <a href="https://github.com/codersantosh/acmeticker/blob/master/README.md">Documentation</a>
-    </p>
+<nav class="nav">
+    <div class="nav-inner">
+        <a class="nav-brand" href="#top" aria-label="AcmeTicker home">
+            <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1974d2"/><rect x="6" y="10" width="20" height="3" fill="white"/><rect x="6" y="17" width="14" height="3" fill="white"/><rect x="6" y="24" width="18" height="3" fill="white"/></svg>
+            AcmeTicker
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#demos">Live demos</a>
+            <a href="#quickstart">Quick start</a>
+            <a href="#api">API</a>
+            <a href="#docs">Docs</a>
+        </div>
+        <div class="nav-actions">
+            <a class="btn btn-outline btn-sm" href="https://github.com/codersantosh/acmeticker">
+                <svg class="icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                Star on GitHub
+            </a>
+            <a class="btn btn-primary btn-sm" href="https://www.npmjs.com/package/acmeticker">npm</a>
+        </div>
+    </div>
+</nav>
 
-    <h2>Live preview</h2>
-    <div class="at-demo-wrap">
-        <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="ticker-preview">
+<header class="hero" id="top">
+    <div class="hero-inner">
+        <span class="hero-badge">v2.0.0 &middot; jQuery-free rewrite</span>
+        <h1>The zero-dependency news ticker for the <em>modern web</em></h1>
+        <p class="hero-sub">Four production-ready engines - vertical, horizontal, marquee and typewriter - with full RTL support, TypeScript types and a 2 kB API. No jQuery, no build step required.</p>
+        <div class="hero-cta">
+            <button class="copy-install" id="hero-copy" aria-label="Copy npm install command">
+                <span>$ npm i acmeticker</span>
+                <span class="copy-btn" id="hero-copy-btn">Copy</span>
+            </button>
+            <a class="btn btn-ghost" href="#demos">View live demos</a>
+        </div>
+        <div class="hero-stats">
+            <span class="stat"><b>0</b> runtime dependencies</span>
+            <span class="stat"><b>4</b> ticker engines</span>
+            <span class="stat"><b>97.4 kB</b> packed</span>
+            <span class="stat"><b>RTL</b> built in</span>
+            <span class="stat"><b>ESM + CJS</b> + global build</span>
+        </div>
+    </div>
+    <div class="hero-ticker-wrap">
+        <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-box-szg hero-ticker" id="hero-ticker">
             <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Latest</div>
             <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
                 <ul class="my-news-ticker">
@@ -110,59 +636,475 @@
                     <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
                     <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
                     <li><a href="#">Season finale heads to extra time with the title still undecided</a></li>
+                    <li><a href="#">Home prices steady as mortgage rates ease for the third straight month</a></li>
+                    <li><a href="#">Airline adds direct summer flights between the two coastal cities</a></li>
                 </ul>
             </div>
             <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
-                <button class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg" aria-label="Toggle playback"></button>
+                <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
             </div>
         </div>
     </div>
+</header>
 
-    <h2>Live demos</h2>
-    <ul class="at-demo-list">
-        <li><a href="examples/index.html">All four types</a> (vertical, horizontal, marquee, typewriter)</li>
-        <li><a href="examples/vertical.html">Vertical ticker</a></li>
-        <li><a href="examples/horizontal.html">Horizontal ticker</a></li>
-        <li><a href="examples/marquee.html">Marquee</a></li>
-        <li><a href="examples/typewriter.html">Typewriter</a></li>
-        <li><a href="examples/rtl.html">Arabic / RTL demo</a> (with an <code>rtl: false</code> override)</li>
-        <li><a href="examples/react/index.html">React demo</a></li>
-        <li><a href="examples/react/rtl.html">React RTL demo</a></li>
-    </ul>
+<main>
+    <section class="section" id="features">
+        <div class="section-head">
+            <div class="kicker">Features</div>
+            <h2>Everything a news ticker needs</h2>
+            <p>Built for publishers and developers who want a ticker that just works - styled by you, driven by AcmeTicker.</p>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></div>
+                <h3>Zero dependencies</h3>
+                <p>Vanilla JavaScript only. No jQuery, no framework - just <code>new AcmeTicker(el, options)</code>.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg></div>
+                <h3>Four engines</h3>
+                <p>Vertical, horizontal, marquee and typewriter modes, switchable at runtime with <code>update()</code>.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M12 3v6l4 2"/></svg></div>
+                <h3>Full RTL support</h3>
+                <p>Automatic mirroring on Arabic and Hebrew pages. Logical <code>left</code>/<code>right</code> directions.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></div>
+                <h3>TypeScript types</h3>
+                <p>Full type declarations shipped with the package. Works under <code>NodeNext</code> and bundler resolution.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></div>
+                <h3>Accessible by default</h3>
+                <p>Pauses on hover and focus, respects <code>prefers-reduced-motion</code>, <code>aria-live</code> aware.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <h3>RAF animations</h3>
+                <p>Buttery 60fps transitions with v1-parity easing. <code>autoplay: 0</code> loops seamlessly.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                <h3>Events &amp; controls</h3>
+                <p><code>acmeTickerCycle</code> and <code>acmeTickerToggle</code> events, selector or element controls.</p>
+            </div>
+            <div class="feature">
+                <div class="f-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div>
+                <h3>Any build setup</h3>
+                <p>ESM, CommonJS and a global script build. Use it with bundlers, script tags or React.</p>
+            </div>
+        </div>
+    </section>
 
-    <h2>Quick start</h2>
-    <pre><code>npm install acmeticker</code></pre>
-    <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/acmeticker@2.0.0/dist/acmeticker.min.js"&gt;&lt;/script&gt;
+    <section class="section" id="demos">
+        <div class="section-head">
+            <div class="kicker">Live demo</div>
+            <h2>Four engines, one line of HTML</h2>
+            <p>These tickers below are running the published library right now. Hit the pause buttons.</p>
+        </div>
+        <div class="stage">
+            <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="stage-vertical">
+                <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Vertical News</div>
+                <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                    <ul class="my-news-ticker">
+                        <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                        <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                        <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                        <li><a href="#">Season finale heads to extra time with the title still undecided</a></li>
+                        <li><a href="#">Home prices steady as mortgage rates ease for the third straight month</a></li>
+                    </ul>
+                </div>
+                <div class="at-ticker-controls at-ticker-controls-vertical at-pos at-flx at-h">
+                    <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                </div>
+            </div>
+
+            <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="stage-horizontal">
+                <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Horizontal News</div>
+                <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                    <ul class="my-news-ticker">
+                        <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                        <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                        <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                        <li><a href="#">Season finale heads to extra time with the title still undecided</a></li>
+                        <li><a href="#">Airline adds direct summer flights between the two coastal cities</a></li>
+                    </ul>
+                </div>
+                <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+                    <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                </div>
+            </div>
+
+            <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="stage-marquee">
+                <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Marquee</div>
+                <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                    <ul class="my-news-ticker">
+                        <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                        <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                        <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                        <li><a href="#">Home prices steady as mortgage rates ease for the third straight month</a></li>
+                    </ul>
+                </div>
+                <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+                    <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                </div>
+            </div>
+
+            <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg" id="stage-typewriter">
+                <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">Typewriter News</div>
+                <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                    <ul class="my-news-ticker">
+                        <li><a href="#">Global markets rally as inflation cools faster than expected</a></li>
+                        <li><a href="#">City launches electric bus fleet with free rides for the first month</a></li>
+                        <li><a href="#">Scientists reveal a new coral reef restoration technique</a></li>
+                    </ul>
+                </div>
+                <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+                    <button aria-label="Previous" class="at-ticker-arrow at-ticker-prev at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                    <button aria-label="Next" class="at-ticker-arrow at-ticker-next at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                </div>
+            </div>
+
+            <p class="stage-note">All four engines running the published <code>dist/acmeticker.min.js</code> build.</p>
+        </div>
+    </section>
+
+    <section class="section" id="rtl">
+        <div class="section-head">
+            <div class="kicker">RTL support</div>
+            <h2>Arabic and Hebrew, out of the box</h2>
+            <p>Point AcmeTicker at a <code>dir="rtl"</code> page and everything mirrors automatically - motion, entry side and rest position.</p>
+        </div>
+        <div class="rtl-grid">
+            <div class="rtl-copy">
+                <h3>Logical directions, zero configuration</h3>
+                <ul>
+                    <li>Automatic detection from <code>dir="rtl"</code>, <code>dir="auto"</code> or CSS <code>direction</code>.</li>
+                    <li><code>direction: 'left' | 'right'</code> stays logical in both languages.</li>
+                    <li>Force or disable with the <code>rtl</code> option - <code>rtl: false</code> keeps physical motion.</li>
+                    <li>Vertical and typewriter modes are direction-neutral and unaffected.</li>
+                </ul>
+                <pre><code>&lt;html lang="ar" dir="rtl"&gt;
+  &lt;ul class="my-news-ticker"&gt;...&lt;/ul&gt;
+&lt;/html&gt;
+
+new AcmeTicker('.my-news-ticker', {
+  type: 'horizontal'
+});</code></pre>
+            </div>
+            <div class="at-ticker at-flx at-pos at-h at-bdr at-bg-cl at-m at-box-szg rtl-ticker" id="rtl-ticker">
+                <div class="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">أخبار</div>
+                <div class="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
+                    <ul class="my-news-ticker" dir="rtl">
+                        <li><a href="#">الأسواق العالمية تسجل مكاسب ملحوظة مع تراجع معدلات التضخم</a></li>
+                        <li><a href="#">المدينة تطلق أسطول الحافلات الكهربائية مع رحلات مجانية للشهر الأول</a></li>
+                        <li><a href="#">علماء يبتكرون تقنية جديدة لاستعادة وحماية الشعب المرجانية</a></li>
+                        <li><a href="#">المباراة النهائية تمتد إلى الأشواط الإضافية وسط منافسة محتدمة</a></li>
+                        <li><a href="#">استقرار أسعار العقارات مع انخفاض الفائدة للشهر الثالث على التوالي</a></li>
+                    </ul>
+                </div>
+                <div class="at-ticker-controls at-ticker-controls-horizontal at-pos at-flx at-h">
+                    <button aria-label="Toggle playback" class="at-ticker-pause at-w at-h at-bdr at-bg-cl at-cur at-p at-pos at-box-szg"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="compare">
+        <div class="section-head">
+            <div class="kicker">v2 vs v1</div>
+            <h2>What changed under the hood</h2>
+            <p>The v2 rewrite keeps the v1 API surface while modernizing everything else.</p>
+        </div>
+        <div class="compare">
+            <table>
+                <thead>
+                    <tr><th>Area</th><th>v1 (jQuery plugin)</th><th>v2 (vanilla)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dependencies</td><td>jQuery required</td><td class="yes">Zero runtime dependencies</td></tr>
+                    <tr><td>Animation</td><td>jQuery animate</td><td class="yes">requestAnimationFrame with v1-parity easing</td></tr>
+                    <tr><td>TypeScript</td><td>None</td><td class="yes">Full type declarations (NodeNext compatible)</td></tr>
+                    <tr><td>RTL support</td><td class="no">Not supported</td><td class="yes">Built-in with logical directions</td></tr>
+                    <tr><td>autoplay: 0</td><td class="no">Corrupted overlapping loops</td><td class="yes">Seamless continuous loop</td></tr>
+                    <tr><td>Builds</td><td>Plugin script only</td><td class="yes">ESM, CommonJS and global builds</td></tr>
+                    <tr><td>Controls</td><td>jQuery objects only</td><td class="yes">Selectors, elements or NodeLists</td></tr>
+                    <tr><td>Events</td><td>Callback arguments</td><td class="yes">Standard <code>event.detail</code> payloads</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section" id="quickstart">
+        <div class="section-head">
+            <div class="kicker">Quick start</div>
+            <h2>Up and running in minutes</h2>
+            <p>Four ways to add a ticker. Pick your setup.</p>
+        </div>
+
+        <div class="code-block" data-code>
+            <div class="cb-head">
+                <span class="cb-title">Install</span>
+                <button class="cb-copy" type="button">Copy</button>
+            </div>
+            <pre>npm install acmeticker</pre>
+        </div>
+
+        <div class="code-block" data-code>
+            <div class="cb-head">
+                <span class="cb-title">Plain script tag</span>
+                <button class="cb-copy" type="button">Copy</button>
+            </div>
+            <pre>&lt;script src="https://cdn.jsdelivr.net/npm/acmeticker@2.0.0/dist/acmeticker.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
-  new AcmeTicker(document.querySelector('.my-news-ticker'), { type: 'horizontal' });
-&lt;/script&gt;</code></pre>
+  new AcmeTicker(document.querySelector('.my-news-ticker'), {
+    type: 'horizontal',
+    direction: 'right'
+  });
+&lt;/script&gt;</pre>
+        </div>
 
-    <p class="at-muted">
-        MIT License &middot;
-        <a href="https://github.com/codersantosh/acmeticker/blob/master/CHANGELOG.md">Changelog</a> &middot;
-        <a href="https://github.com/codersantosh/acmeticker/blob/master/LICENSE">License</a>
-    </p>
-</div>
+        <div class="code-block" data-code>
+            <div class="cb-head">
+                <span class="cb-title">Vanilla / bundlers</span>
+                <button class="cb-copy" type="button">Copy</button>
+            </div>
+            <pre>import { AcmeTicker } from 'acmeticker';
+
+const ticker = new AcmeTicker(document.querySelector('ul.ticker'), {
+  type: 'vertical',
+  direction: 'up',
+  speed: 600,
+  autoplay: 4000,
+  pauseOnHover: true,
+  controls: {
+    prev: '.at-ticker-prev',
+    next: '.at-ticker-next',
+    toggle: '.at-ticker-pause'
+  }
+});</pre>
+        </div>
+
+        <div class="code-block" data-code>
+            <div class="cb-head">
+                <span class="cb-title">React</span>
+                <button class="cb-copy" type="button">Copy</button>
+            </div>
+            <pre>import { useEffect, useRef } from 'react';
+import { AcmeTicker } from 'acmeticker';
+
+function Ticker({ items }) {
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    const ticker = new AcmeTicker(listRef.current, {
+      type: 'marquee'
+    });
+    return () => ticker.destroy();
+  }, []);
+
+  return (
+    &lt;ul ref={listRef}&gt;
+      {items.map((item) =&gt; &lt;li key={item}&gt;{item}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}</pre>
+        </div>
+    </section>
+
+    <section class="section" id="examples">
+        <div class="section-head">
+            <div class="kicker">Example pages</div>
+            <h2>See it in action</h2>
+            <p>Standalone demo pages for every engine and integration style.</p>
+        </div>
+        <div class="demos">
+            <a class="demo-card" href="examples/index.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
+                <h3>All four types</h3>
+                <p>Vertical, horizontal, marquee and typewriter on one page.</p>
+            </a>
+            <a class="demo-card" href="examples/vertical.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7-7 7 7"/></svg></div>
+                <h3>Vertical</h3>
+                <p>The classic top-to-bottom news feed.</p>
+            </a>
+            <a class="demo-card" href="examples/horizontal.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                <h3>Horizontal</h3>
+                <p>Slide transitions with manual navigation.</p>
+            </a>
+            <a class="demo-card" href="examples/marquee.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8h20v8H2zM7 12h10"/></svg></div>
+                <h3>Marquee</h3>
+                <p>Continuous scrolling with a seamless loop.</p>
+            </a>
+            <a class="demo-card" href="examples/typewriter.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+                <h3>Typewriter</h3>
+                <p>Headlines typed out character by character.</p>
+            </a>
+            <a class="demo-card" href="examples/rtl.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V4M17 20V4M5 20h4M15 4h4"/></svg></div>
+                <h3>Arabic / RTL</h3>
+                <p>Every engine mirrored under <code>dir="rtl"</code>, plus an <code>rtl: false</code> override.</p>
+            </a>
+            <a class="demo-card" href="examples/react/index.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
+                <h3>React demo</h3>
+                <p>The four engines inside a React component tree.</p>
+            </a>
+            <a class="demo-card" href="examples/react/rtl.html">
+                <div class="dc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div>
+                <h3>React RTL demo</h3>
+                <p>Arabic headlines with mirrored motion in React.</p>
+            </a>
+        </div>
+    </section>
+
+    <section class="section" id="api">
+        <div class="section-head">
+            <div class="kicker">API</div>
+            <h2>Options and methods</h2>
+            <p>The complete public surface - small on purpose.</p>
+        </div>
+        <div class="api-table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Option</th><th>Default</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>type</code></td><td><code>'horizontal'</code></td><td>vertical, horizontal, marquee or typewriter</td></tr>
+                    <tr><td><code>autoplay</code></td><td><code>2000</code></td><td>Pause between transitions (0 = continuous loop)</td></tr>
+                    <tr><td><code>speed</code></td><td><code>50</code></td><td>Transition duration, char delay or marquee px/ms</td></tr>
+                    <tr><td><code>direction</code></td><td><code>'up'</code></td><td>up / down / left / right - logical under RTL</td></tr>
+                    <tr><td><code>rtl</code></td><td><code>'auto'</code></td><td>auto-detect, or force <code>true</code> / <code>false</code></td></tr>
+                    <tr><td><code>pauseOnFocus</code></td><td><code>true</code></td><td>Pause while the ticker region is focused</td></tr>
+                    <tr><td><code>pauseOnHover</code></td><td><code>true</code></td><td>Pause while the pointer is over the ticker</td></tr>
+                    <tr><td><code>controls</code></td><td><code>{}</code></td><td>prev / next / toggle - selectors, elements or NodeLists</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="methods">
+            <span class="method-chip"><code>play()</code> resume</span>
+            <span class="method-chip"><code>pause()</code> freeze</span>
+            <span class="method-chip"><code>toggle()</code> flip</span>
+            <span class="method-chip"><code>next()</code> / <code>prev()</code> navigate</span>
+            <span class="method-chip"><code>update()</code> re-configure</span>
+            <span class="method-chip"><code>destroy()</code> teardown</span>
+        </div>
+    </section>
+</main>
+
+<footer class="footer" id="docs">
+    <div class="footer-inner">
+        <div>
+            <h4>AcmeTicker</h4>
+            <ul>
+                <li>A zero-dependency vanilla JS news ticker.</li>
+                <li>Successor to the v1 jQuery plugin.</li>
+                <li>MIT licensed. Free forever.</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Documentation</h4>
+            <ul>
+                <li><a href="https://github.com/codersantosh/acmeticker/blob/master/README.md">README</a></li>
+                <li><a href="https://github.com/codersantosh/acmeticker/blob/master/CHANGELOG.md">Changelog</a></li>
+                <li><a href="https://github.com/codersantosh/acmeticker/blob/master/LICENSE">License</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Package</h4>
+            <ul>
+                <li><a href="https://www.npmjs.com/package/acmeticker">npm registry</a></li>
+                <li><a href="https://cdn.jsdelivr.net/npm/acmeticker@2.0.0/dist/acmeticker.min.js">CDN (jsDelivr)</a></li>
+                <li><a href="https://unpkg.com/acmeticker@2.0.0/dist/acmeticker.min.js">CDN (unpkg)</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Community</h4>
+            <ul>
+                <li><a href="https://github.com/codersantosh/acmeticker">GitHub repository</a></li>
+                <li><a href="https://github.com/codersantosh/acmeticker/issues">Report an issue</a></li>
+                <li><a href="https://github.com/codersantosh/acmeticker/stargazers">Star the project</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">AcmeTicker is released under the MIT License.</div>
+</footer>
 
 <script src="dist/acmeticker.min.js"></script>
 <script>
-    const preview = document.querySelector('#ticker-preview .my-news-ticker');
-    if (preview) {
-        const ticker = new AcmeTicker(preview, {
-            type: 'horizontal',
-            direction: 'right',
-            speed: 600,
-            controls: {
-                toggle: document.querySelector('#ticker-preview .at-ticker-pause')
+    (function () {
+        function initTicker(rootId, options) {
+            var tickerEl = document.querySelector(rootId + ' .my-news-ticker');
+            if (!tickerEl) {
+                return null;
             }
+            var controls = {
+                prev: document.querySelector(rootId + ' .at-ticker-prev'),
+                next: document.querySelector(rootId + ' .at-ticker-next'),
+                toggle: document.querySelector(rootId + ' .at-ticker-pause')
+            };
+            var ticker = new AcmeTicker(tickerEl, Object.assign({}, options, { controls: controls }));
+            document.querySelector(rootId + ' .at-ticker-pause')?.classList.toggle('is-paused', ticker.paused);
+            return ticker;
+        }
+
+        initTicker('#hero-ticker', { type: 'marquee', direction: 'left', speed: 0.05 });
+        initTicker('#stage-vertical', { type: 'vertical', direction: 'up', speed: 600 });
+        initTicker('#stage-horizontal', { type: 'horizontal', direction: 'right', speed: 600 });
+        initTicker('#stage-marquee', { type: 'marquee', direction: 'left', speed: 0.05 });
+        initTicker('#stage-typewriter', { type: 'typewriter', speed: 50 });
+        initTicker('#rtl-ticker', { type: 'horizontal', direction: 'right', speed: 600 });
+
+        document.addEventListener('acmeTickerToggle', function (event) {
+            var detail = event.detail;
+            var pauseBtn = detail.ticker.closest('.at-ticker')?.querySelector('.at-ticker-pause');
+            pauseBtn?.classList.toggle('is-paused', detail.paused);
         });
-        document.querySelector('#ticker-preview .at-ticker-pause')?.classList.toggle('is-paused', ticker.paused);
-    }
-    document.addEventListener('acmeTickerToggle', (event) => {
-        const { ticker, paused } = event.detail;
-        const pauseBtn = ticker.closest('.at-ticker')?.querySelector('.at-ticker-pause');
-        pauseBtn?.classList.toggle('is-paused', paused);
-    });
+
+        function copyText(text, onDone) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                var settled = false;
+                var finish = function () {
+                    if (!settled) { settled = true; onDone(); }
+                };
+                navigator.clipboard.writeText(text).then(finish).catch(finish);
+                setTimeout(finish, 400);
+            } else {
+                onDone();
+            }
+        }
+
+        document.querySelector('#hero-copy')?.addEventListener('click', function () {
+            copyText('npm i acmeticker', flashCopied);
+        });
+
+        document.querySelectorAll('.code-block').forEach(function (block) {
+            block.querySelector('.cb-copy')?.addEventListener('click', function () {
+                var text = block.querySelector('pre')?.textContent || '';
+                var btn = block.querySelector('.cb-copy');
+                copyText(text, function () { btn.textContent = 'Copied'; });
+                setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+            });
+        });
+
+        function flashCopied() {
+            var btn = document.querySelector('#hero-copy-btn');
+            var original = btn.textContent;
+            btn.textContent = 'Copied';
+            setTimeout(function () { btn.textContent = original; }, 1600);
+        }
+    })();
 </script>
 </body>
 </html>
