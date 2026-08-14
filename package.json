@@ -1,7 +1,7 @@
 {
   "name": "acmeticker",
   "version": "2.0.0",
-  "description": "Vanilla JS news ticker with vertical, horizontal, marquee and typewriter modes. jQuery-free successor to the v1 jQuery plugin.",
+  "description": "Modern zero-dependency vanilla JS news ticker with vertical, horizontal, marquee and typewriter engines, full RTL support, and TypeScript types.",
   "type": "module",
   "main": "./dist/acmeticker.cjs",
   "module": "./dist/acmeticker.esm.js",

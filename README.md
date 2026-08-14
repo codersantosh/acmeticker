@@ -2,7 +2,7 @@
 
 [![Live demo](https://img.shields.io/badge/live%20demo-github%20pages-1974d2)](https://codersantosh.github.io/acmeticker/)
 
-A lightweight, zero-dependency vanilla JS library for advanced news tickers. Successor to the v1 jQuery plugin: same four ticker types and options, modern animation (RAF), TypeScript types, and no jQuery anywhere.
+A modern, zero-dependency vanilla JS library for advanced news tickers with vertical, horizontal, marquee and typewriter engines, full RTL support, and TypeScript types. Modern successor to the v1 jQuery plugin: same four ticker types and options, 60fps RAF animation, and zero dependencies.
 
 Demo: [Gutentor News Ticker](https://www.demo.gutentor.com/news-ticker/) &middot; [Live examples](https://codersantosh.github.io/acmeticker/examples/index.html)
 
