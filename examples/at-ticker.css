@@ -7,7 +7,7 @@
   --at-bdr-cl: #1974d2;
   --at-bg-cl: #fff;
   --at-box-szg: border-box;
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
 }
 
 .at-ticker-label {

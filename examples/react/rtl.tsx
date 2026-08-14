@@ -5,6 +5,17 @@ import { AcmeTicker } from 'acmeticker';
 import type { AcmeTickerControls, AcmeTickerOptions } from 'acmeticker';
 
 const HEADLINES = [
+  'الأسواق العالمية تسجل مكاسب ملحوظة مع تراجع معدلات التضخم',
+  'المدينة تطلق أسطول الحافلات الكهربائية مع رحلات مجانية للشهر الأول',
+  'علماء يبتكرون تقنية جديدة لاستعادة وحماية الشعب المرجانية',
+  'المباراة النهائية تمتد إلى الأشواط الإضافية وسط منافسة محتدمة',
+  'استقرار أسعار العقارات مع انخفاض الفائدة للشهر الثالث على التوالي',
+  'افتتاح مقهى جديد يقدم ورش عمل أسبوعية لعشاق القهوة',
+  'دراسة حديثة تؤكد فوائد المشي الصباحي لتعزيز الذاكرة والنشاط',
+  'تدشين رحلات طيران مباشرة جديدة بين المدينتين الساحليتين',
+];
+
+const EN_HEADLINES = [
   'Global markets rally as inflation cools faster than expected',
   'City launches electric bus fleet with free rides for the first month',
   'Scientists reveal a new coral reef restoration technique',
@@ -20,9 +31,10 @@ interface TickerSectionProps {
   label: string;
   options: Partial<AcmeTickerOptions>;
   pauseOnly?: boolean;
+  headlines?: string[];
 }
 
-function TickerSection({ title, label, options, pauseOnly = false }: TickerSectionProps) {
+function TickerSection({ title, label, options, pauseOnly = false, headlines = HEADLINES }: TickerSectionProps) {
   const listRef = useRef<HTMLUListElement>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -57,7 +69,7 @@ function TickerSection({ title, label, options, pauseOnly = false }: TickerSecti
         <div className="at-ticker-label at-bg-cl at-cl at-p at-flx-srnk-0">{label}</div>
         <div className="at-ticker-box at-h at-ovf at-p at-flx-grw-1 at-box-szg">
           <ul ref={listRef} className="my-news-ticker">
-            {HEADLINES.map((headline) => (
+            {headlines.map((headline) => (
               <li key={headline}>
                 <a href="#">{headline}</a>
               </li>
@@ -82,30 +94,31 @@ function RtlDemo() {
   return (
     <div className="at-ctnr" id="at-demos">
       <TickerSection
-        title="Vertical Ticker"
-        label="Vertical News"
+        title="شريط الأخبار العمودي"
+        label="أخبار عاجلة"
         options={{ type: 'vertical', direction: 'up', speed: 600 }}
       />
       <TickerSection
-        title="Horizontal Ticker"
-        label="Horizontal News"
+        title="شريط الأخبار الأفقي"
+        label="أخبار"
         options={{ type: 'horizontal', direction: 'right', speed: 600 }}
       />
       <TickerSection
-        title="Marquee"
-        label="Marquee"
+        title="شريط متحرك (ماركي)"
+        label="عاجل"
         options={{ type: 'marquee', direction: 'left', speed: 0.05 }}
         pauseOnly
       />
       <TickerSection
-        title="Typewriter"
-        label="Typewriter News"
+        title="شريط الآلة الكاتبة"
+        label="موجز الأخبار"
         options={{ type: 'typewriter', speed: 50 }}
       />
       <TickerSection
-        title="Horizontal Ticker (rtl: false)"
+        title="شريط أفقي (تعطيل RTL)"
         label="Horizontal News"
         options={{ type: 'horizontal', direction: 'right', rtl: false, speed: 600 }}
+        headlines={EN_HEADLINES}
       />
     </div>
   );
