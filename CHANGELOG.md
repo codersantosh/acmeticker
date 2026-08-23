@@ -2,6 +2,17 @@
 
 All notable changes to AcmeTicker are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.1] - 2026-08-23
+
+### Changed
+
+- **Leaner tarball (~456 KB → ~129 KB unpacked; 25 → 17 files).** Redundant dist outputs and all source maps are gone:
+  - Removed `dist/acmeticker.esm.min.js` and `dist/acmeticker.min.cjs` - never exposed via the `exports` map; npm/bundler consumers use `acmeticker.esm.js` / `acmeticker.cjs`.
+  - Removed all `dist/*.map` source maps.
+  - **CDN note:** jsDelivr/unpkg deep links to those two removed files return 404 on `@2.0.1`. For `<script>` tags use `dist/acmeticker.min.js`; for modules install via npm.
+- **CI hardening:** the CI workflow now declares least-privilege `permissions: contents: read`.
+- **Demo pages unified:** all example pages now carry the same inline SVG favicon as the docs homepage.
+
 ## [2.0.0] - 2026-08-14
 
 ### Breaking changes
