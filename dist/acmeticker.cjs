@@ -964,4 +964,3 @@ function mergeOptions(options) {
     }
   };
 }
-//# sourceMappingURL=acmeticker.cjs.map

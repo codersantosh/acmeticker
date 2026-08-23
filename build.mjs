@@ -4,7 +4,6 @@ import { rmSync } from 'node:fs';
 
 const shared = {
   bundle: true,
-  sourcemap: true,
   target: 'es2020',
   logLevel: 'info',
 };
@@ -16,9 +15,7 @@ const globalFooter =
 
 const builds = [
   { format: 'esm', outfile: 'dist/acmeticker.esm.js' },
-  { format: 'esm', minify: true, outfile: 'dist/acmeticker.esm.min.js' },
   { format: 'cjs', outfile: 'dist/acmeticker.cjs' },
-  { format: 'cjs', minify: true, outfile: 'dist/acmeticker.min.cjs' },
   {
     format: 'iife',
     globalName: 'AcmeTicker',

@@ -941,4 +941,3 @@ export {
   AcmeTicker,
   DEFAULTS
 };
-//# sourceMappingURL=acmeticker.esm.js.map

@@ -967,4 +967,3 @@ var AcmeTicker = (() => {
   return __toCommonJS(index_exports);
 })();
 AcmeTicker = Object.assign(AcmeTicker.AcmeTicker, AcmeTicker);
-//# sourceMappingURL=acmeticker.js.map
